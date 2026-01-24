@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 import { ArrowUpRight, Twitter, Github, Linkedin, Mail } from 'lucide-react';
 
 const companies = [
+  { name: 'BaaziGames - PokerBaazi', href: 'https://baazigames.com' },
   { name: 'BharatPe', href: 'https://bharatpe.com' },
-  { name: 'PokerBaazi', href: 'https://pokerbaazi.com' },
   { name: 'CARS24', href: 'https://cars24.com' },
   { name: 'Indianic', href: 'https://indianic.com' },
 ];
@@ -90,16 +90,15 @@ export default function Home() {
 
         <p className='text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-xl'>
           Mobile app developer with 4+ years crafting React Native apps.
-          Currently shaping fintech at{' '}
+          Currently building mobile apps at{' '}
           <a
-            href='https://bharatpe.com'
+            href={companies[0].href}
             className='text-zinc-900 dark:text-zinc-100 font-medium hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors'
             target='_blank'
             rel='noopener noreferrer'
           >
-            BharatPe
+            {companies[0].name}
           </a>
-          .
         </p>
       </motion.section>
 
