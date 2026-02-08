@@ -43,18 +43,11 @@ export default function BlogPage() {
 
   return (
     <div className='mx-auto max-w-2xl px-6 py-16'>
-      <Link
-        href='/'
-        className='text-sm text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 mb-12 inline-block'
-      >
-        ← Back
-      </Link>
-
       <header className='mb-12'>
-        <h1 className='text-2xl font-semibold text-zinc-900 dark:text-zinc-100'>
+        <h1 className='text-xl font-medium text-zinc-900 dark:text-zinc-100'>
           Writing
         </h1>
-        <p className='text-zinc-500 dark:text-zinc-500 mt-2'>
+        <p className='text-zinc-500 dark:text-zinc-400 mt-2'>
           Thoughts on mobile development, React Native, and building apps.
         </p>
       </header>
@@ -64,13 +57,13 @@ export default function BlogPage() {
           <Link
             key={post.slug}
             href={`/blog/${post.slug}`}
-            className='group flex items-baseline justify-between py-3 -mx-3 px-3 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors'
+            className='group flex items-baseline justify-between py-3'
           >
-            <span className='text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors'>
+            <span className='text-zinc-900 dark:text-zinc-100 group-hover:opacity-60 transition-opacity'>
               {post.title}
             </span>
             {post.date && (
-              <span className='text-sm text-zinc-400 dark:text-zinc-600 tabular-nums ml-4 shrink-0'>
+              <span className='text-sm text-zinc-400 dark:text-zinc-500 tabular-nums ml-4 shrink-0'>
                 {formatDate(post.date)}
               </span>
             )}
@@ -78,7 +71,7 @@ export default function BlogPage() {
         ))}
 
         {posts.length === 0 && (
-          <p className='text-zinc-500 dark:text-zinc-500 py-8 text-center'>
+          <p className='text-zinc-500 dark:text-zinc-400 py-8 text-center'>
             No posts yet.
           </p>
         )}

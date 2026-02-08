@@ -75,14 +75,14 @@ export default async function BlogPost({
   if (!post) {
     return (
       <div className='mx-auto max-w-2xl px-6 py-16'>
-        <h1 className='text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mb-4'>
+        <h1 className='text-xl font-medium text-zinc-900 dark:text-zinc-100 mb-4'>
           Post not found
         </h1>
         <Link
-          href='/'
-          className='text-sm text-zinc-600 dark:text-zinc-400 underline'
+          href='/blog'
+          className='text-sm text-zinc-500 dark:text-zinc-400 underline underline-offset-2'
         >
-          ← Back home
+          Back to blog
         </Link>
       </div>
     );
@@ -92,20 +92,13 @@ export default async function BlogPost({
 
   return (
     <div className='mx-auto max-w-2xl px-6 py-16'>
-      <Link
-        href='/#writing'
-        className='text-sm text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 mb-8 inline-block'
-      >
-        ← Back
-      </Link>
-
       <article>
         <header className='mb-8'>
-          <h1 className='text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mb-2'>
+          <h1 className='text-xl font-medium text-zinc-900 dark:text-zinc-100 mb-2'>
             {post.title}
           </h1>
           {post.date && (
-            <time className='text-sm text-zinc-500 dark:text-zinc-500'>
+            <time className='text-sm text-zinc-500 dark:text-zinc-400'>
               {post.date}
             </time>
           )}
