@@ -107,6 +107,26 @@ export default async function BlogPost({
         <div className='prose prose-zinc dark:prose-invert prose-sm max-w-none'>
           <MDXContent components={useMDXComponents()} />
         </div>
+
+        <footer className='mt-12 pt-6 border-t border-zinc-100 dark:border-zinc-800/50'>
+          <div className='flex items-center gap-3'>
+            <img
+              src='https://github.com/hrithik73.png'
+              alt='Hritik Singh'
+              width={36}
+              height={36}
+              className='rounded-full ring-1 ring-zinc-200 dark:ring-zinc-700/50'
+            />
+            <div>
+              <p className='text-sm font-medium text-zinc-900 dark:text-zinc-100'>
+                Hritik Singh
+              </p>
+              <p className='text-xs text-zinc-500 dark:text-zinc-400'>
+                Mobile App Developer
+              </p>
+            </div>
+          </div>
+        </footer>
       </article>
     </div>
   );

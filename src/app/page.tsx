@@ -17,9 +17,23 @@ export default function Home() {
     <div className='mx-auto max-w-2xl px-6 py-12'>
       {/* Intro */}
       <section className='mb-10'>
-        <h2 className='text-xl font-medium text-zinc-900 dark:text-zinc-100 mb-3'>
-          Hritik Singh
-        </h2>
+        <div className='flex items-start gap-4 mb-3'>
+          <img
+            src='https://github.com/hrithik73.png'
+            alt='Hritik Singh'
+            width={56}
+            height={56}
+            className='rounded-full ring-1 ring-zinc-200 dark:ring-zinc-700/50 shrink-0'
+          />
+          <div>
+            <h2 className='text-xl font-medium text-zinc-900 dark:text-zinc-100'>
+              Hritik Singh
+            </h2>
+            <p className='text-sm text-zinc-500 dark:text-zinc-400 mt-0.5'>
+              Mobile App Developer
+            </p>
+          </div>
+        </div>
         <p className='text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-xl'>
           Mobile app developer with 4+ years crafting React Native apps.
           Currently at{' '}
