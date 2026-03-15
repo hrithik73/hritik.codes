@@ -6,6 +6,7 @@ import rehypePrettyCode from 'rehype-pretty-code';
 import Link from 'next/link';
 import * as runtime from 'react/jsx-runtime';
 import { useMDXComponents } from '@/mdx-components';
+import { ViewCounter } from '@/components/ViewCounter';
 
 const blogDir = path.join(process.cwd(), 'content/blog');
 
@@ -33,7 +34,7 @@ async function getPost(slug: string) {
       [
         rehypePrettyCode,
         {
-          theme: 'poimandres',
+          theme: { light: 'github-light', dark: 'poimandres' },
           keepBackground: false,
           defaultLang: 'plaintext',
         },
@@ -75,14 +76,14 @@ export default async function BlogPost({
   if (!post) {
     return (
       <div className='mx-auto max-w-2xl px-6 py-16'>
-        <h1 className='text-xl font-medium text-zinc-900 dark:text-zinc-100 mb-4'>
+        <h1 className='text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4'>
           Post not found
         </h1>
         <Link
           href='/blog'
-          className='text-sm text-zinc-500 dark:text-zinc-400 underline underline-offset-2'
+          className='text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors'
         >
-          Back to blog
+          ← back to writing
         </Link>
       </div>
     );
@@ -91,31 +92,48 @@ export default async function BlogPost({
   const { MDXContent } = post;
 
   return (
-    <div className='mx-auto max-w-2xl px-6 py-16'>
+    <div className='mx-auto max-w-2xl px-6 py-14 anim-1'>
+      <Link
+        href='/blog'
+        className='inline-block text-sm text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors mb-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded'
+      >
+        ← writing
+      </Link>
+
       <article>
-        <header className='mb-8'>
-          <h1 className='text-xl font-medium text-zinc-900 dark:text-zinc-100 mb-2'>
+        <header className='mb-10'>
+          <h1 className='text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3 text-pretty tracking-tight leading-snug'>
             {post.title}
           </h1>
-          {post.date && (
-            <time className='text-sm text-zinc-500 dark:text-zinc-400'>
-              {post.date}
-            </time>
-          )}
+          <div className='flex items-center gap-3'>
+            {post.date && (
+              <time
+                dateTime={String(post.date).replace(/\//g, '-')}
+                className='text-sm text-zinc-400 dark:text-zinc-500'
+              >
+                {post.date}
+              </time>
+            )}
+            {post.date && (
+              <span className='text-zinc-300 dark:text-zinc-700'>·</span>
+            )}
+            <ViewCounter slug={slug} />
+          </div>
         </header>
 
         <div className='prose prose-zinc dark:prose-invert prose-sm max-w-none'>
           <MDXContent components={useMDXComponents()} />
         </div>
 
-        <footer className='mt-12 pt-6 border-t border-zinc-100 dark:border-zinc-800/50'>
+        <footer className='mt-14 pt-6 border-t border-zinc-200/70 dark:border-zinc-800/50'>
           <div className='flex items-center gap-3'>
             <img
               src='https://github.com/hrithik73.png'
               alt='Hritik Singh'
               width={36}
               height={36}
-              className='rounded-full ring-1 ring-zinc-200 dark:ring-zinc-700/50'
+              loading='lazy'
+              className='rounded-full shadow-sm shadow-zinc-900/10 dark:shadow-black/40'
             />
             <div>
               <p className='text-sm font-medium text-zinc-900 dark:text-zinc-100'>

@@ -4,8 +4,8 @@ import { ThemeSwitcher } from './ThemeSwitcher';
 function Logo() {
   return (
     <svg
-      width='28'
-      height='28'
+      width='26'
+      height='26'
       viewBox='0 0 100 100'
       fill='none'
       xmlns='http://www.w3.org/2000/svg'
@@ -32,18 +32,19 @@ function Logo() {
 
 export function Header() {
   return (
-    <header className='border-b border-zinc-100 dark:border-zinc-800/50'>
+    <header className='sticky top-0 z-40 border-b border-zinc-200/70 dark:border-zinc-800/50 bg-[var(--background)]/85 backdrop-blur-md'>
       <div className='mx-auto flex max-w-2xl items-center justify-between px-6 py-4'>
         <Link
           href='/'
-          className='text-zinc-900 dark:text-zinc-100 hover:opacity-60 transition-opacity'
+          aria-label='Home'
+          className='text-zinc-900 dark:text-zinc-100 hover:opacity-60 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded'
         >
           <Logo />
         </Link>
-        <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-5'>
           <Link
             href='/blog'
-            className='text-sm text-zinc-500 dark:text-zinc-400 hover:opacity-60 transition-opacity'
+            className='text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded'
           >
             blog
           </Link>

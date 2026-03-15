@@ -19,13 +19,13 @@ export function ThemeSwitcher() {
   return (
     <button
       onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-      className='p-1.5 text-zinc-500 dark:text-zinc-400 hover:opacity-60 transition-opacity'
+      className='p-1.5 text-zinc-500 dark:text-zinc-400 hover:opacity-60 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded'
       aria-label='Toggle theme'
     >
       {resolvedTheme === 'dark' ? (
-        <Sun className='h-4 w-4' />
+        <Sun className='h-4 w-4' aria-hidden='true' />
       ) : (
-        <Moon className='h-4 w-4' />
+        <Moon className='h-4 w-4' aria-hidden='true' />
       )}
     </button>
   );
