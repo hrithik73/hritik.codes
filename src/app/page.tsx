@@ -1,16 +1,8 @@
+import fs from 'fs';
+import path from 'path';
+import matter from 'gray-matter';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
-
-const blogs = [
-  {
-    title: 'Import Aliases in React Native',
-    href: '/blog/import-aliases-in-react-native',
-  },
-  {
-    title: 'How to create a boilerplate',
-    href: '/blog/how-to-create-boilerplate-in-react-native',
-  },
-];
 
 const experience = [
   {
@@ -55,6 +47,32 @@ const stack = [
 const inlineLink =
   'text-zinc-800 dark:text-zinc-200 underline decoration-amber-400/70 dark:decoration-amber-500/50 underline-offset-2 hover:decoration-amber-500 dark:hover:decoration-amber-400 transition-[text-decoration-color]';
 
+function getPosts() {
+  const blogDir = path.join(process.cwd(), 'content/blog');
+  if (!fs.existsSync(blogDir)) return [];
+
+  return fs
+    .readdirSync(blogDir)
+    .filter((f) => f.endsWith('.md') || f.endsWith('.mdx'))
+    .map((file) => {
+      const { data } = matter(
+        fs.readFileSync(path.join(blogDir, file), 'utf8'),
+      );
+      return {
+        slug: file.replace(/\.(md|mdx)$/, ''),
+        title: data.title as string,
+        date: data.date as string | undefined,
+      };
+    })
+    .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''))
+    .slice(0, 3);
+}
+
+function formatDate(dateString: string) {
+  const date = new Date(dateString.replace(/\//g, '-'));
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+
 function SectionHeader({
   label,
   action,
@@ -74,6 +92,8 @@ function SectionHeader({
 }
 
 export default function Home() {
+  const posts = getPosts();
+
   return (
     <div className='mx-auto max-w-2xl px-6 py-16'>
       {/* Hero */}
@@ -162,7 +182,7 @@ export default function Home() {
               href={item.href}
               target='_blank'
               rel='noopener noreferrer'
-              className='group flex items-baseline justify-between py-2.5 -mx-3 px-3 rounded-lg hover:bg-stone-100 dark:hover:bg-white/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400'
+              className='group flex items-center justify-between py-2.5 -mx-3 px-3 rounded-lg hover:bg-stone-100 dark:hover:bg-white/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400'
             >
               <div className='flex items-center gap-2.5 min-w-0'>
                 <img
@@ -194,7 +214,7 @@ export default function Home() {
           {stack.map((s) => (
             <span
               key={s}
-              className='text-xs px-2.5 py-1 rounded-full bg-stone-100 dark:bg-white/[0.05] text-zinc-600 dark:text-zinc-400 font-medium'
+              className='text-xs px-2.5 py-1 rounded-full border border-zinc-200 dark:border-zinc-700/60 text-zinc-600 dark:text-zinc-400 font-medium'
             >
               {s}
             </span>
@@ -220,14 +240,14 @@ export default function Home() {
             </span>
           </div>
           <ArrowUpRight
-            className='w-4 h-4 text-amber-500/80 shrink-0 opacity-0 group-hover:opacity-100 translate-x-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all'
+            className='w-4 h-4 text-amber-500/80 shrink-0 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all'
             aria-hidden='true'
           />
         </a>
       </section>
 
       {/* Writing */}
-      <section className='anim-5'>
+      <section className='mb-12 anim-5'>
         <SectionHeader
           label='Writing'
           action={
@@ -240,22 +260,44 @@ export default function Home() {
           }
         />
         <div>
-          {blogs.map((blog, i) => (
+          {posts.map((post) => (
             <Link
-              key={i}
-              href={blog.href}
+              key={post.slug}
+              href={`/blog/${post.slug}`}
               className='group flex items-center justify-between py-3 -mx-3 px-3 rounded-lg hover:bg-stone-100 dark:hover:bg-white/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400'
             >
               <span className='text-zinc-900 dark:text-zinc-100 text-sm'>
-                {blog.title}
+                {post.title}
               </span>
-              <ArrowUpRight
-                className='w-4 h-4 text-amber-500/80 shrink-0 opacity-0 group-hover:opacity-100 translate-x-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all'
-                aria-hidden='true'
-              />
+              <div className='flex items-center gap-3 shrink-0 ml-4'>
+                {post.date && (
+                  <span className='text-xs text-zinc-400 dark:text-zinc-500 tabular-nums'>
+                    {formatDate(post.date)}
+                  </span>
+                )}
+                <ArrowUpRight
+                  className='w-4 h-4 text-amber-500/80 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all'
+                  aria-hidden='true'
+                />
+              </div>
             </Link>
           ))}
         </div>
+      </section>
+
+      {/* Contact */}
+      <section className='anim-6'>
+        <SectionHeader label='Contact' />
+        <p className='text-[15px] text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4'>
+          Open to new roles, side projects, or just a good conversation.
+        </p>
+        <a
+          href='mailto:shrithik404@gmail.com'
+          className='group inline-flex items-center gap-1.5 text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:text-amber-600 dark:hover:text-amber-400 transition-colors'
+        >
+          shrithik404@gmail.com
+          <ArrowUpRight className='w-3.5 h-3.5 text-zinc-400 group-hover:text-amber-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all' />
+        </a>
       </section>
     </div>
   );
