@@ -18,24 +18,28 @@ const experience = [
     role: 'SDE-2',
     period: 'Jan 2026 – present',
     href: 'https://baazigames.com',
+    domain: 'baazigames.com',
   },
   {
     company: 'BharatPe',
     role: 'SDE-2',
     period: 'Sep 2025 – Jan 2026',
     href: 'https://bharatpe.com',
+    domain: 'bharatpe.com',
   },
   {
     company: 'CARS24',
     role: 'SDE-2',
     period: 'Apr 2024 – Mar 2025',
     href: 'https://cars24.com',
+    domain: 'cars24.com',
   },
   {
     company: 'IndiaNIC',
     role: 'Software Engineer',
     period: 'Jun 2022 – Feb 2024',
     href: 'https://indianic.com',
+    domain: 'indianic.com',
   },
 ];
 
@@ -160,7 +164,14 @@ export default function Home() {
               rel='noopener noreferrer'
               className='group flex items-baseline justify-between py-2.5 -mx-3 px-3 rounded-lg hover:bg-stone-100 dark:hover:bg-white/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400'
             >
-              <div className='flex items-baseline gap-2.5 min-w-0'>
+              <div className='flex items-center gap-2.5 min-w-0'>
+                <img
+                  src={`https://www.google.com/s2/favicons?domain=${item.domain}&sz=64`}
+                  alt={item.company}
+                  width={18}
+                  height={18}
+                  className='rounded-sm shrink-0 bg-white'
+                />
                 <span className='text-zinc-900 dark:text-zinc-100 font-medium text-sm'>
                   {item.company}
                 </span>
