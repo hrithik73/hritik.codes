@@ -11,6 +11,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-plus-jakarta);
+  --font-display: var(--font-instrument-serif);
 }
 
 .dark {
@@ -55,13 +56,31 @@ body::after {
 }
 
 .anim-1 {
-  animation: fadeInUp 0.5s ease both;
+  animation: fadeInUp 0.55s ease both;
 }
 .anim-2 {
-  animation: fadeInUp 0.5s 0.08s ease both;
+  animation: fadeInUp 0.55s 0.1s ease both;
 }
 .anim-3 {
-  animation: fadeInUp 0.5s 0.16s ease both;
+  animation: fadeInUp 0.55s 0.2s ease both;
+}
+.anim-4 {
+  animation: fadeInUp 0.55s 0.3s ease both;
+}
+.anim-5 {
+  animation: fadeInUp 0.55s 0.38s ease both;
+}
+.anim-6 {
+  animation: fadeInUp 0.55s 0.46s ease both;
+}
+
+@keyframes expandWidth {
+  from { transform: scaleX(0); transform-origin: left; }
+  to   { transform: scaleX(1); transform-origin: left; }
+}
+
+.amber-rule {
+  animation: expandWidth 0.6s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
