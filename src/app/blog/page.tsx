@@ -54,9 +54,6 @@ export default async function BlogPage() {
         <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 text-pretty tracking-tight">
           Writing
         </h1>
-        <p className="text-[15px] text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">
-          Thoughts on mobile development, React Native, and building apps.
-        </p>
       </header>
 
       <div>

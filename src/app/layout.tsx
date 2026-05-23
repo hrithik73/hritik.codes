@@ -20,7 +20,7 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   title: "Hritik Singh — Mobile App Developer",
   description:
-    "SDE-2 specialising in React Native. 4+ years building apps at BaaziGames, BharatPe, and CARS24. Pixel-perfect UIs and smooth animations.",
+    "React Native developer with 4+ years building mobile apps at BaaziGames, BharatPe, and CARS24. I care about things feeling fast and smooth.",
 };
 
 export const viewport: Viewport = {

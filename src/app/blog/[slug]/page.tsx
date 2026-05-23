@@ -1,6 +1,7 @@
 import { evaluate } from "@mdx-js/mdx";
 import fs from "fs";
 import matter from "gray-matter";
+import type { Metadata } from "next";
 import Link from "next/link";
 import path from "path";
 import * as runtime from "react/jsx-runtime";
@@ -52,6 +53,30 @@ async function getPost(slug: string) {
   };
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPost(slug);
+  if (!post) return {};
+  return {
+    title: `${post.title} — Hritik Singh`,
+    description: post.description,
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: "article",
+    },
+    twitter: {
+      card: "summary",
+      title: post.title,
+      description: post.description,
+    },
+  };
+}
+
 export async function generateStaticParams() {
   if (!fs.existsSync(blogDir)) {
     return [];
@@ -93,16 +118,9 @@ export default async function BlogPost({
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-14 anim-1">
-      <Link
-        href="/blog"
-        className="inline-block text-sm text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors mb-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded"
-      >
-        ← writing
-      </Link>
-
       <article>
         <header className="mb-10">
-          <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3 text-pretty tracking-tight leading-snug">
+          <h1 className="font-display text-[clamp(1.6rem,5vw,2.25rem)] text-zinc-900 dark:text-zinc-50 mb-4 text-pretty tracking-tight leading-tight">
             {post.title}
           </h1>
           <div className="flex items-center gap-3">
@@ -126,24 +144,12 @@ export default async function BlogPost({
         </div>
 
         <footer className="mt-14 pt-6 border-t border-zinc-200/70 dark:border-zinc-800/50">
-          <div className="flex items-center gap-3">
-            <img
-              src="https://github.com/hrithik73.png"
-              alt="Hritik Singh"
-              width={36}
-              height={36}
-              loading="lazy"
-              className="rounded-full shadow-sm shadow-zinc-900/10 dark:shadow-black/40"
-            />
-            <div>
-              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                Hritik Singh
-              </p>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                Mobile App Developer
-              </p>
-            </div>
-          </div>
+          <Link
+            href="/blog"
+            className="text-sm text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+          >
+            ← all posts
+          </Link>
         </footer>
       </article>
     </div>
