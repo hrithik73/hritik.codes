@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -32,7 +32,7 @@ body {
 
 /* Subtle grain texture for depth */
 body::after {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -74,9 +74,30 @@ body::after {
   animation: fadeInUp 0.55s 0.46s ease both;
 }
 
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-tab-content {
+  animation: tabFadeIn 0.3s ease both;
+}
+
 @keyframes expandWidth {
-  from { transform: scaleX(0); transform-origin: left; }
-  to   { transform: scaleX(1); transform-origin: left; }
+  from {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  to {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
 }
 
 .amber-rule {
@@ -94,13 +115,13 @@ body::after {
 }
 
 /* Legacy Prism styles - only apply if not using rehype-pretty-code */
-pre:not([data-theme]) code[class*='language-'],
-pre:not([data-theme]) pre[class*='language-'] {
+pre:not([data-theme]) code[class*="language-"],
+pre:not([data-theme]) pre[class*="language-"] {
   color: #18181b;
   background: none;
   text-shadow: none;
   font-family:
-    'Fira Code', 'Consolas', 'Monaco', 'Andale Mono', 'Ubuntu Mono', monospace;
+    "Fira Code", "Consolas", "Monaco", "Andale Mono", "Ubuntu Mono", monospace;
   font-size: 0.875rem;
   text-align: left;
   white-space: pre;
@@ -159,14 +180,14 @@ pre[data-theme] .line {
   padding-right: 1rem;
 }
 
-pre[data-theme] .line[data-highlighted='true'],
+pre[data-theme] .line[data-highlighted="true"],
 pre[data-theme] .line--highlighted {
   background: rgba(175, 184, 193, 0.15) !important;
   padding-left: calc(1rem - 3px);
   border-left: 3px solid #0969da !important;
 }
 
-.dark pre[data-theme] .line[data-highlighted='true'],
+.dark pre[data-theme] .line[data-highlighted="true"],
 .dark pre[data-theme] .line--highlighted {
   background: rgba(110, 118, 129, 0.15) !important;
   border-left-color: #58a6ff !important;

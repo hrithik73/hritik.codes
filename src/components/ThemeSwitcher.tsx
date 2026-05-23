@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
-import { Sun, Moon } from 'lucide-react';
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export function ThemeSwitcher() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -13,19 +13,19 @@ export function ThemeSwitcher() {
   }, []);
 
   if (!mounted) {
-    return <div className='w-8 h-8' />;
+    return <div className="w-8 h-8" />;
   }
 
   return (
     <button
-      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-      className='p-1.5 text-zinc-500 dark:text-zinc-400 hover:opacity-60 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded'
-      aria-label='Toggle theme'
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+      className="p-1.5 text-zinc-500 dark:text-zinc-400 hover:opacity-60 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded"
+      aria-label="Toggle theme"
     >
-      {resolvedTheme === 'dark' ? (
-        <Sun className='h-4 w-4' aria-hidden='true' />
+      {resolvedTheme === "dark" ? (
+        <Sun className="h-4 w-4" aria-hidden="true" />
       ) : (
-        <Moon className='h-4 w-4' aria-hidden='true' />
+        <Moon className="h-4 w-4" aria-hidden="true" />
       )}
     </button>
   );

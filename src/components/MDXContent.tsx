@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
-import { useMDXComponents } from '@/mdx-components';
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import { useMDXComponents } from "@/mdx-components";
 
 export function MDXContentWrapper({
   MDXContent,
@@ -19,11 +19,11 @@ export function MDXContentWrapper({
   useEffect(() => {
     if (!mounted) return;
 
-    const codeBlocks = document.querySelectorAll('pre[data-theme]');
+    const codeBlocks = document.querySelectorAll("pre[data-theme]");
     codeBlocks.forEach((block) => {
       const htmlElement = block as HTMLElement;
-      const currentTheme = htmlElement.getAttribute('data-theme');
-      htmlElement.setAttribute('data-theme', currentTheme || '');
+      const currentTheme = htmlElement.getAttribute("data-theme");
+      htmlElement.setAttribute("data-theme", currentTheme || "");
     });
   }, [theme, resolvedTheme, mounted]);
 

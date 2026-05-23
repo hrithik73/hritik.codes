@@ -1,32 +1,32 @@
-import type { Metadata, Viewport } from 'next';
-import { Plus_Jakarta_Sans, Instrument_Serif } from 'next/font/google';
-import { Analytics } from '@vercel/analytics/next';
-import './globals.css';
-import { ThemeProvider } from '@/components/ThemeProvider';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+import { Analytics } from "@vercel/analytics/next";
+import type { Metadata, Viewport } from "next";
+import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
+import "./globals.css";
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const plusJakarta = Plus_Jakarta_Sans({
-  variable: '--font-plus-jakarta',
-  subsets: ['latin'],
+  variable: "--font-plus-jakarta",
+  subsets: ["latin"],
 });
 
 const instrumentSerif = Instrument_Serif({
-  variable: '--font-instrument-serif',
-  subsets: ['latin'],
-  weight: '400',
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
-  title: 'Hritik Singh — Mobile App Developer',
+  title: "Hritik Singh — Mobile App Developer",
   description:
-    'SDE-2 specialising in React Native. 4+ years building apps at BaaziGames, BharatPe, and CARS24. Pixel-perfect UIs and smooth animations.',
+    "SDE-2 specialising in React Native. 4+ years building apps at BaaziGames, BharatPe, and CARS24. Pixel-perfect UIs and smooth animations.",
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
-    { media: '(prefers-color-scheme: dark)', color: '#111111' },
+    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
+    { media: "(prefers-color-scheme: dark)", color: "#111111" },
   ],
 };
 
@@ -36,18 +36,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en' suppressHydrationWarning>
-      <body className={`${plusJakarta.variable} ${instrumentSerif.variable} font-sans antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${plusJakarta.variable} ${instrumentSerif.variable} font-sans antialiased`}
+      >
         <ThemeProvider>
           <a
-            href='#main-content'
-            className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-zinc-900 focus:px-4 focus:py-2 focus:text-sm focus:text-zinc-100 dark:focus:bg-zinc-100 dark:focus:text-zinc-900'
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-zinc-900 focus:px-4 focus:py-2 focus:text-sm focus:text-zinc-100 dark:focus:bg-zinc-100 dark:focus:text-zinc-900"
           >
             Skip to content
           </a>
-          <div className='flex min-h-screen flex-col'>
+          <div className="flex min-h-screen flex-col">
             <Header />
-            <main id='main-content' className='flex-1'>
+            <main id="main-content" className="flex-1">
               {children}
             </main>
             <Footer />
