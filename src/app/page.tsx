@@ -102,13 +102,26 @@ export default function Home() {
         </p>
 
         <p className="text-[15px] text-zinc-600 dark:text-zinc-400 leading-[1.85] max-w-lg">
-          4+ years building React Native apps — from fintech and used-car
-          marketplaces to real-time poker tables. I care about things feeling
-          fast and smooth, not just working.
-        </p>
-
-        <p className="text-[15px] text-zinc-600 dark:text-zinc-400 leading-[1.85] max-w-lg mt-4">
-          Right now at{" "}
+          I've spent the last 4 years building mobile apps people actually use —
+          payments at{" "}
+          <a
+            href="https://bharatpe.com"
+            className={inlineLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            BharatPe
+          </a>
+          , used cars at{" "}
+          <a
+            href="https://cars24.com"
+            className={inlineLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            CARS24
+          </a>
+          , and now building games at{" "}
           <a
             href="https://baazigames.com"
             className={inlineLink}
@@ -117,9 +130,13 @@ export default function Home() {
           >
             BaaziGames
           </a>
-          , Currently at BaaziGames building the PokerBaazi table. Reanimated
-          animations, WebSocket state, and a live game that has to stay in sync.
+          .
         </p>
+
+        {/* <p className="text-[15px] text-zinc-600 dark:text-zinc-400 leading-[1.85] max-w-lg mt-4">
+          Right now I'm building a live poker table. It's hard to get right and
+          that's kind of why I like it.
+        </p> */}
       </section>
 
       {/* Work */}

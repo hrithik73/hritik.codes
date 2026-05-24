@@ -1,14 +1,15 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
-import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
+import { Archivo, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
-const plusJakarta = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
+  axes: ["wdth"],
 });
 
 const instrumentSerif = Instrument_Serif({
@@ -38,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${plusJakarta.variable} ${instrumentSerif.variable} font-sans antialiased`}
+        className={`${archivo.variable} ${instrumentSerif.variable} font-sans antialiased`}
       >
         <ThemeProvider>
           <a
