@@ -65,11 +65,10 @@ function SectionHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-3 mb-5">
+    <div className="flex items-center justify-between mb-5">
       <span className="text-[10px] tracking-[0.18em] uppercase font-bold text-zinc-400 dark:text-zinc-500 shrink-0">
         {label}
       </span>
-      <div className="flex-1 h-px bg-zinc-200/80 dark:bg-zinc-800/80" />
       {action}
     </div>
   );

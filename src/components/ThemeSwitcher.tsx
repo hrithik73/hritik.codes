@@ -1,32 +1,91 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+const CYCLE: Record<string, string> = {
+  system: "light",
+  light: "dark",
+  dark: "system",
+};
+
+const LABELS: Record<string, string> = {
+  system: "Switch to light mode",
+  light: "Switch to dark mode",
+  dark: "Switch to system theme",
+};
+
+function playClickSound() {
+  if (typeof window === "undefined") return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  try {
+    const ctx = new AudioContext();
+    const now = ctx.currentTime;
+
+    const bufferSize = Math.floor(ctx.sampleRate * 0.035);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 10);
+    }
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.value = 1400;
+    filter.Q.value = 0.7;
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.35, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    noise.start(now);
+    noise.onended = () => ctx.close();
+  } catch {}
+}
 
 export function ThemeSwitcher() {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [iconKey, setIconKey] = useState(0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  const handleClick = useCallback(() => {
+    const current = theme ?? "system";
+    const next = CYCLE[current] ?? "light";
+    playClickSound();
+    setIconKey((k) => k + 1);
+    setTheme(next);
+  }, [theme, setTheme]);
+
   if (!mounted) {
     return <div className="w-8 h-8" />;
   }
 
+  const current = theme ?? "system";
+  const Icon =
+    current === "dark" ? Moon : current === "light" ? Sun : Monitor;
+
   return (
     <button
-      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-      className="p-1.5 text-zinc-500 dark:text-zinc-400 hover:opacity-60 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded"
-      aria-label="Toggle theme"
+      onClick={handleClick}
+      className="p-1.5 cursor-pointer text-zinc-500 dark:text-zinc-400 hover:opacity-60 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded"
+      aria-label={LABELS[current]}
+      title={LABELS[current]}
     >
-      {resolvedTheme === "dark" ? (
-        <Sun className="h-4 w-4" aria-hidden="true" />
-      ) : (
-        <Moon className="h-4 w-4" aria-hidden="true" />
-      )}
+      <span key={iconKey} className="block theme-icon-pop">
+        <Icon className="h-4 w-4" aria-hidden="true" />
+      </span>
     </button>
   );
 }
