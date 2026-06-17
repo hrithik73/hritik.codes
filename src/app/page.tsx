@@ -101,26 +101,8 @@ export default function Home() {
         </p>
 
         <p className="text-[15px] text-zinc-600 dark:text-zinc-400 leading-[1.85] max-w-lg">
-          I've spent the last 4 years building mobile apps people actually use —
-          payments at{" "}
-          <a
-            href="https://bharatpe.com"
-            className={inlineLink}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            BharatPe
-          </a>
-          , used cars at{" "}
-          <a
-            href="https://cars24.com"
-            className={inlineLink}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            CARS24
-          </a>
-          , and now building games at{" "}
+          Digital craftsman with 5+ years building and scaling mobile apps— currently
+          at{" "}
           <a
             href="https://baazigames.com"
             className={inlineLink}
@@ -128,6 +110,24 @@ export default function Home() {
             rel="noopener noreferrer"
           >
             BaaziGames
+          </a>
+          . Previously at{" "}
+          <a
+            href="https://bharatpe.com"
+            className={inlineLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            BharatPe
+          </a>{" "}
+          and{" "}
+          <a
+            href="https://cars24.com"
+            className={inlineLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            CARS24
           </a>
           .
         </p>
