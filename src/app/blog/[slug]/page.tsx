@@ -11,6 +11,15 @@ import { useMDXComponents } from "@/mdx-components";
 
 const blogDir = path.join(process.cwd(), "content/blog");
 
+function formatDate(dateString: string) {
+  const date = new Date(dateString.replace(/\//g, "-"));
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 async function getPost(slug: string) {
   const mdPath = path.join(blogDir, `${slug}.md`);
   const mdxPath = path.join(blogDir, `${slug}.mdx`);
@@ -97,16 +106,15 @@ export default async function BlogPost({
 }) {
   const { slug } = await params;
   const post = await getPost(slug);
+  const components = useMDXComponents();
 
   if (!post) {
     return (
       <div className="mx-auto max-w-2xl px-6 py-16">
-        <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
-          Post not found
-        </h1>
+        <h1 className="font-display text-xl text-ink mb-4">Post not found</h1>
         <Link
           href="/blog"
-          className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+          className="text-sm text-muted hover:text-ink transition-colors"
         >
           ← back to writing
         </Link>
@@ -117,36 +125,34 @@ export default async function BlogPost({
   const { MDXContent } = post;
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-14 anim-1">
+    <div className="mx-auto max-w-2xl px-6 py-14 anim-page">
       <article>
         <header className="mb-10">
-          <h1 className="font-display text-[clamp(1.6rem,5vw,2.25rem)] text-zinc-900 dark:text-zinc-50 mb-4 text-pretty tracking-tight leading-tight">
+          <h1 className="font-display text-[clamp(1.6rem,5vw,2.25rem)] text-ink mb-4 text-pretty leading-tight">
             {post.title}
           </h1>
           <div className="flex items-center gap-3">
             {post.date && (
               <time
                 dateTime={String(post.date).replace(/\//g, "-")}
-                className="text-sm text-zinc-400 dark:text-zinc-500"
+                className="text-sm text-muted"
               >
-                {post.date}
+                {formatDate(post.date)}
               </time>
             )}
-            {post.date && (
-              <span className="text-zinc-300 dark:text-zinc-700">·</span>
-            )}
+            {post.date && <span className="text-muted/50">·</span>}
             <ViewCounter slug={slug} />
           </div>
         </header>
 
-        <div className="prose prose-zinc dark:prose-invert prose-sm max-w-none">
-          <MDXContent components={useMDXComponents()} />
+        <div className="max-w-none">
+          <MDXContent components={components} />
         </div>
 
-        <footer className="mt-14 pt-6 border-t border-zinc-200/70 dark:border-zinc-800/50">
+        <footer className="mt-14 pt-6 border-t border-line">
           <Link
             href="/blog"
-            className="text-sm text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+            className="text-sm text-muted hover:text-ink transition-colors"
           >
             ← all posts
           </Link>

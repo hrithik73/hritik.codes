@@ -1,0 +1,90 @@
+// Single source of truth for work history — home shows the first three,
+// /projects shows everything with locations and notes.
+export const experience = [
+  {
+    company: 'Baazi Games',
+    href: 'https://baazigames.com',
+    domain: 'baazigames.com',
+    role: 'SDE-2',
+    location: 'Delhi (Hybrid)',
+    period: 'Jan 2026 - Present',
+    note: 'Back on the PokerBaazi game table — real-time interactive UI and complex game state.',
+  },
+  {
+    company: 'BharatPe',
+    href: 'https://bharatpe.com',
+    domain: 'bharatpe.com',
+    role: 'SDE-2',
+    location: 'Gurugram',
+    period: 'Sep 2025 - Jan 2026',
+    note: 'Consumer mobile app. Revamped the Credit Card onboarding journey and tightened up payment flows.',
+  },
+  {
+    company: 'Baazi Games',
+    href: 'https://baazigames.com',
+    domain: 'baazigames.com',
+    role: 'SDE-2',
+    location: 'Delhi (Hybrid)',
+    period: 'Mar 2025 - Sep 2025',
+    note: 'PokerBaazi game table — real-time interactive UI, Reanimated-heavy, lots of complex game state to wrangle.',
+  },
+  {
+    company: 'CARS24',
+    href: 'https://cars24.com',
+    domain: 'cars24.com',
+    role: 'SDE-2',
+    location: 'Gurugram',
+    period: 'Apr 2024 - Mar 2025',
+    note: 'Channel Partner B2B app for dealers. Built the design system, shipped iOS Live Activities, and cut load times.',
+  },
+  {
+    company: 'IndiaNIC Infotech',
+    href: 'https://indianic.com',
+    domain: 'indianic.com',
+    role: 'Software Engineer',
+    location: 'Remote',
+    period: 'Jun 2022 - Feb 2024',
+    note: 'Client apps across e-commerce, fitness, social, and enterprise HRMS. Full feature cycles, start to ship.',
+  },
+  {
+    company: 'Big Oh Tech',
+    href: 'https://bigohtech.com',
+    domain: 'bigohtech.com',
+    role: 'Intern',
+    location: 'Noida',
+    period: 'Jan 2022 - Jun 2022',
+    note: 'Drag-and-drop microsite builder in React and Next.js. My first real job.',
+  },
+  {
+    company: 'Blump Tech',
+    href: 'https://www.blump.tech',
+    domain: 'blumptech.com',
+    role: 'Intern',
+    location: 'Remote',
+    period: 'Aug 2021 - Dec 2021',
+    note: 'React Native class-to-hooks migration, version bump, and bug fixes.',
+  },
+];
+
+export const sideProjects = [
+  {
+    title: 'RN Starter',
+    href: 'https://github.com/hrithik73/rn-starter',
+    note: 'Opinionated React Native template — TypeScript, navigation, Redux, and theming all pre-wired.',
+  },
+  {
+    title: 'SpaceX Dashboard',
+    href: 'https://github.com/hrithik73/spacex-dashboard',
+    note: 'Launch history, rockets, Starlink satellites — pulled from the public SpaceX API.',
+  },
+  {
+    title: 'YouTube Clone',
+    href: 'https://github.com/hrithik73/youtube-clone',
+    note: 'Search, playback, channel pages. Built with Expo and the YouTube Data API.',
+  },
+  {
+    title: 'Dukaan Clone',
+    href: 'https://github.com/hrithik73/dukaan-app-clone',
+    note: 'Pixel-perfect mobile commerce clone. Focused on list perf and smooth Reanimated transitions.',
+  },
+];

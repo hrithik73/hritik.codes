@@ -11,51 +11,43 @@ export function useMDXComponents(
   return {
     // Allows customizing built-in components, e.g. to add styling.
     h1: ({ children }) => (
-      <h1 className="text-3xl font-semibold text-zinc-900 dark:text-zinc-100 mt-8 mb-4">
-        {children}
-      </h1>
+      <h1 className="font-display text-3xl text-ink mt-8 mb-4">{children}</h1>
     ),
     h2: ({ children }) => (
-      <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mt-6 mb-3">
-        {children}
-      </h2>
+      <h2 className="font-display text-2xl text-ink mt-8 mb-3">{children}</h2>
     ),
     h3: ({ children }) => (
-      <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mt-4 mb-2">
-        {children}
-      </h3>
+      <h3 className="font-display text-xl text-ink mt-6 mb-2">{children}</h3>
     ),
     p: ({ children }) => (
-      <p className="text-zinc-600 dark:text-zinc-400 mb-4 leading-relaxed">
-        {children}
-      </p>
+      <p className="text-base text-ink/90 mb-4 leading-[1.75]">{children}</p>
     ),
     a: ({ href, children }) => (
       <a
         href={href}
-        className="text-zinc-900 dark:text-zinc-100 underline hover:text-zinc-600 dark:hover:text-zinc-400"
+        className="text-ink underline decoration-accent decoration-[1.5px] underline-offset-[3px] hover:decoration-primary transition-[text-decoration-color]"
       >
         {children}
       </a>
     ),
     ul: ({ children }) => (
-      <ul className="list-disc list-inside mb-4 text-zinc-600 dark:text-zinc-400 space-y-2">
+      <ul className="list-disc list-inside mb-4 text-ink/90 space-y-2">
         {children}
       </ul>
     ),
     ol: ({ children }) => (
-      <ol className="list-decimal list-inside mb-4 text-zinc-600 dark:text-zinc-400 space-y-2">
+      <ol className="list-decimal list-inside mb-4 text-ink/90 space-y-2">
         {children}
       </ol>
     ),
-    li: ({ children }) => <li className="ml-4">{children}</li>,
+    li: ({ children }) => <li className="ml-4 leading-[1.75]">{children}</li>,
     code: ({ children, className, ...props }) => {
       const isInlineCode = !className;
 
       if (isInlineCode) {
         return (
           <code
-            className="text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-sm before:content-[''] after:content-['']"
+            className="text-ink bg-surface px-1.5 py-0.5 rounded text-sm"
             {...props}
           >
             {children}
@@ -82,11 +74,11 @@ export function useMDXComponents(
       );
     },
     blockquote: ({ children }) => (
-      <blockquote className="border-l-4 border-zinc-300 dark:border-zinc-600 pl-4 italic text-zinc-600 dark:text-zinc-400 my-4">
+      <blockquote className="bg-surface rounded-lg px-5 py-1 italic text-muted my-4">
         {children}
       </blockquote>
     ),
-    hr: () => <hr className="my-8 border-zinc-300 dark:border-zinc-700" />,
+    hr: () => <hr className="my-8 border-line" />,
     ...components,
   };
 }

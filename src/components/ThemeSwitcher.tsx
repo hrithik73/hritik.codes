@@ -73,17 +73,17 @@ export function ThemeSwitcher() {
   }
 
   const current = theme ?? "system";
-  const Icon =
-    current === "dark" ? Moon : current === "light" ? Sun : Monitor;
+  const Icon = current === "dark" ? Moon : current === "light" ? Sun : Monitor;
 
   return (
     <button
+      type="button"
       onClick={handleClick}
-      className="p-1.5 cursor-pointer text-zinc-500 dark:text-zinc-400 hover:opacity-60 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded"
+      className="p-3.5 -m-2 cursor-pointer text-muted hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded"
       aria-label={LABELS[current]}
       title={LABELS[current]}
     >
-      <span key={iconKey} className="block theme-icon-pop">
+      <span key={iconKey} className="block theme-icon-turn">
         <Icon className="h-4 w-4" aria-hidden="true" />
       </span>
     </button>

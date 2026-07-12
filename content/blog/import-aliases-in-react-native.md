@@ -34,7 +34,7 @@ import image from '@src/assets/images';
 
 This might give a better idea, of where the components are imported and also looks good
 
-### So how can I configure it in react-native?
+## So how can I configure it in react-native?
 
 Well, it’s a bit tricky to configure this in react native, because you have to make some changes in Babel config, but it’s not difficult at all
 
@@ -124,7 +124,7 @@ module.exports = {
 };
 ```
 
-## Step 3 :
+### Step 3 :
 
 Restart your metro bundler with reset caches
 
@@ -134,7 +134,7 @@ yarn start --reset-cache
 
 Done now you can use the import aliases
 
-### Expo
+## Expo
 
 If you are using the expo cli , then this is the guide for you
 

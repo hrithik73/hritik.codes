@@ -7,11 +7,11 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-zinc-200/70 dark:border-zinc-800/50">
+    <footer className="border-t border-line">
       <div className="mx-auto max-w-2xl px-6 py-5 flex items-center justify-between">
         <nav
           aria-label="Social links"
-          className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-400 dark:text-zinc-500"
+          className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted"
         >
           {socialLinks.map((link) => (
             <a
@@ -23,13 +23,13 @@ export function Footer() {
                   ? undefined
                   : "noopener noreferrer"
               }
-              className="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded"
+              className="hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded"
             >
               {link.name}
             </a>
           ))}
         </nav>
-        <span className="text-xs text-zinc-300 dark:text-zinc-600 tabular-nums">
+        <span className="text-xs text-muted tabular-nums">
           {new Date().getFullYear()}
         </span>
       </div>

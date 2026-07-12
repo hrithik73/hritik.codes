@@ -49,11 +49,9 @@ export default async function BlogPage() {
   );
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-14 anim-1">
+    <div className="mx-auto max-w-2xl px-6 py-14 anim-page">
       <header className="mb-10">
-        <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 text-pretty tracking-tight">
-          Writing
-        </h1>
+        <h1 className="font-display text-3xl text-ink">Writing</h1>
       </header>
 
       <div>
@@ -61,19 +59,17 @@ export default async function BlogPage() {
           <Link
             key={post.slug}
             href={`/blog/${post.slug}`}
-            className="group flex items-baseline justify-between py-2.5 -mx-3 px-3 rounded-lg hover:bg-stone-100 dark:hover:bg-white/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+            className="group flex items-baseline justify-between py-2.5 -mx-3 px-3 rounded-lg hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
           >
-            <span className="text-zinc-900 dark:text-zinc-100">
-              {post.title}
-            </span>
+            <span className="text-ink text-[15px]">{post.title}</span>
             <span className="flex items-baseline gap-3 ml-4 shrink-0">
               {viewCounts[i] != null && (
-                <span className="text-xs text-zinc-300 dark:text-zinc-600 tabular-nums">
+                <span className="text-sm text-muted tabular-nums">
                   {(viewCounts[i] as number).toLocaleString()}
                 </span>
               )}
               {post.date && (
-                <span className="text-xs text-zinc-400 dark:text-zinc-500 tabular-nums">
+                <span className="text-sm text-muted tabular-nums">
                   {formatDate(post.date)}
                 </span>
               )}
@@ -82,9 +78,7 @@ export default async function BlogPage() {
         ))}
 
         {posts.length === 0 && (
-          <p className="text-zinc-500 dark:text-zinc-400 py-8 text-center">
-            No posts yet.
-          </p>
+          <p className="text-muted py-8 text-center">No posts yet.</p>
         )}
       </div>
     </div>
