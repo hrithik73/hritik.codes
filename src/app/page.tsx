@@ -5,7 +5,7 @@ import Link from 'next/link';
 import path from 'path';
 import { experience } from '@/config/experience';
 
-const recentWork = experience.slice(0, 3);
+const recentWork = experience.slice(0, 4);
 
 const inlineLink =
   'text-ink underline decoration-accent decoration-[1.5px] underline-offset-[3px] hover:decoration-primary transition-[text-decoration-color]';
