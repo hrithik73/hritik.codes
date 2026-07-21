@@ -1,5 +1,5 @@
 const socialLinks = [
-  { name: "twitter", href: "https://x.com/hrithik73_" },
+  { name: "x", href: "https://x.com/hrithik73_" },
   { name: "github", href: "https://github.com/hrithik73" },
   { name: "linkedin", href: "https://linkedin.com/in/hrithik73" },
   { name: "email", href: "mailto:shrithik404@gmail.com" },

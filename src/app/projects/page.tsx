@@ -51,7 +51,7 @@ export default function ProjectsPage() {
                   alt=''
                   width={15}
                   height={15}
-                  className='rounded-full shrink-0 bg-white ring-[0.5px] ring-inset ring-black/[0.04] dark:ring-white/[0.04]'
+                  className='rounded-full shrink-0 bg-white ring-[0.5px] ring-inset ring-black/[0.04] grayscale'
                 />
                 <a
                   href={item.href}

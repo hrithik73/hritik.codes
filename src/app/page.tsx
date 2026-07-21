@@ -51,19 +51,19 @@ function SectionHeading({
   );
 }
 
-/* A hand-drawn pen stroke under the name — the one organic gesture on this page */
+/* A short accent rule under the name — the one graphic gesture on this page */
 function Squiggle() {
   return (
     <svg
-      viewBox='0 0 120 10'
-      className='w-40 h-2.5 text-accent mt-2'
+      viewBox='0 0 56 4'
+      className='w-14 h-1 text-accent mt-3'
       fill='none'
       aria-hidden='true'
     >
       <path
-        d='M2 6 C 16 2, 30 9, 46 5 S 72 2, 88 7 S 110 4, 118 5'
+        d='M2 2 L 54 2'
         stroke='currentColor'
-        strokeWidth='2.5'
+        strokeWidth='3'
         strokeLinecap='round'
         pathLength={128}
         className='squiggle-draw'
@@ -133,39 +133,53 @@ export default function Home() {
           action={
             <Link
               href='/projects'
-              className='text-sm text-primary hover:text-ink transition-colors shrink-0'
+              className='text-sm text-accent hover:text-ink transition-colors shrink-0'
             >
               full history →
             </Link>
           }
         />
         <div>
-          {recentWork.map((item) => (
-            <a
-              key={`${item.company}-${item.period}`}
-              href={item.href}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='group flex items-center justify-between py-2.5 -mx-3 px-3 rounded-lg hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60'
-            >
-              <div className='flex items-center gap-2.5 min-w-0'>
-                <img
-                  src={`https://www.google.com/s2/favicons?domain=${item.domain}&sz=64`}
-                  alt={item.company}
-                  width={18}
-                  height={18}
-                  className='rounded-full shrink-0 bg-white ring-[0.5px] ring-inset ring-black/[0.04] dark:ring-white/[0.04]'
-                />
-                <span className='text-ink font-medium text-[15px]'>
-                  {item.company}
+          {recentWork.map((item) => {
+            const current = item.period.endsWith('Present');
+            return (
+              <a
+                key={`${item.company}-${item.period}`}
+                href={item.href}
+                target='_blank'
+                rel='noopener noreferrer'
+                className={`group flex items-center justify-between py-2.5 -mx-3 px-3 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
+                  current
+                    ? 'bg-surface ring-1 ring-line hover:ring-accent/40'
+                    : 'hover:bg-surface'
+                }`}
+              >
+                <div className='flex items-center gap-2.5 min-w-0'>
+                  <img
+                    src={`https://www.google.com/s2/favicons?domain=${item.domain}&sz=64`}
+                    alt={item.company}
+                    width={18}
+                    height={18}
+                    className='rounded-full shrink-0 bg-white ring-[0.5px] ring-inset ring-black/[0.04] grayscale group-hover:grayscale-0 transition-[filter]'
+                  />
+                  <span className='text-ink font-medium text-[15px]'>
+                    {item.company}
+                  </span>
+                  <span className='text-muted text-sm truncate'>
+                    {item.role}
+                  </span>
+                  {current && (
+                    <span className='text-[11px] font-medium text-accent border border-accent/40 rounded-full px-1.5 py-0.5 leading-none shrink-0'>
+                      current
+                    </span>
+                  )}
+                </div>
+                <span className='text-sm text-muted tabular-nums shrink-0 ml-4'>
+                  {item.period}
                 </span>
-                <span className='text-muted text-sm truncate'>{item.role}</span>
-              </div>
-              <span className='text-sm text-muted tabular-nums shrink-0 ml-4'>
-                {item.period}
-              </span>
-            </a>
-          ))}
+              </a>
+            );
+          })}
         </div>
       </section>
 
@@ -176,7 +190,7 @@ export default function Home() {
           action={
             <Link
               href='/blog'
-              className='text-sm text-primary hover:text-ink transition-colors shrink-0'
+              className='text-sm text-accent hover:text-ink transition-colors shrink-0'
             >
               all posts →
             </Link>
@@ -223,16 +237,16 @@ export default function Home() {
             rel='noopener noreferrer'
             className='group inline-flex items-center gap-1 text-[15px] text-muted hover:text-ink transition-colors'
           >
-            twitter
+            x
             <ArrowUpRight className='w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all' />
           </a>
           <a
-            href='https://github.com/hrithik73'
+            href='https://linkedin.com/in/hrithik73'
             target='_blank'
             rel='noopener noreferrer'
             className='group inline-flex items-center gap-1 text-[15px] text-muted hover:text-ink transition-colors'
           >
-            github
+            linkedin
             <ArrowUpRight className='w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all' />
           </a>
         </div>

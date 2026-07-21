@@ -3,27 +3,27 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * Fountain ink on a bright page.
- * Warmth lives in the accent + typography, never in the background.
+ * Minimal, mono-inspired, dark-mode-first.
+ * True near-black + true off-white neutrals; one lime-signal accent used sparingly.
  */
 :root {
-  --bg: oklch(1 0 0);
-  --surface: oklch(0.965 0.008 245);
-  --ink: oklch(0.28 0.045 245);
-  --muted: oklch(0.5 0.035 245);
-  --primary: oklch(0.47 0.13 245);
-  --accent: oklch(0.72 0.14 65);
-  --line: oklch(0.91 0.01 245);
+  --bg: oklch(0.99 0 0);
+  --surface: oklch(0.95 0 0);
+  --ink: oklch(0.17 0 0);
+  --muted: oklch(0.45 0 0);
+  --primary: oklch(0.17 0 0);
+  --accent: oklch(0.58 0.16 128);
+  --line: oklch(0.88 0 0);
 }
 
 .dark {
-  --bg: oklch(0.15 0.012 250);
-  --surface: oklch(0.2 0.015 250);
-  --ink: oklch(0.9 0.015 245);
-  --muted: oklch(0.7 0.025 245);
-  --primary: oklch(0.72 0.1 245);
-  --accent: oklch(0.76 0.13 65);
-  --line: oklch(0.28 0.015 250);
+  --bg: oklch(0.16 0 0);
+  --surface: oklch(0.21 0 0);
+  --ink: oklch(0.94 0 0);
+  --muted: oklch(0.72 0 0);
+  --primary: oklch(0.94 0 0);
+  --accent: oklch(0.87 0.19 128);
+  --line: oklch(0.3 0 0);
 }
 
 @theme inline {
@@ -36,6 +36,10 @@
   --color-line: var(--line);
   --font-sans: var(--font-hanken);
   --font-display: var(--font-young-serif);
+}
+
+html {
+  font-size: 90%;
 }
 
 body {
@@ -52,7 +56,7 @@ h3 {
 
 ::selection {
   background-color: var(--accent);
-  color: oklch(0.25 0.05 65);
+  color: oklch(0.15 0.04 128);
 }
 
 /* Home-page greeting: one orchestrated entrance, ease-out only */
@@ -179,5 +183,5 @@ pre[data-theme] .line {
 
 pre[data-theme] .line[data-highlighted="true"],
 pre[data-theme] .line--highlighted {
-  background: oklch(0.72 0.14 65 / 0.12);
+  background: color-mix(in oklch, var(--accent) 14%, transparent);
 }
