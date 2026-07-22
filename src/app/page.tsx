@@ -76,9 +76,9 @@ export default function Home() {
   const posts = getPosts();
 
   return (
-    <div className='mx-auto max-w-2xl px-6 py-16'>
+    <div className='mx-auto max-w-2xl px-6 py-10'>
       {/* Hero */}
-      <section className='mb-16 anim-1'>
+      <section className='mb-10 anim-1'>
         <div className='flex items-end gap-4'>
           <img
             src='https://github.com/hrithik73.png'
@@ -127,7 +127,7 @@ export default function Home() {
       </section>
 
       {/* Work */}
-      <section className='mb-12 anim-2'>
+      <section className='mb-8 anim-2'>
         <SectionHeading
           title='Work'
           action={
@@ -184,7 +184,7 @@ export default function Home() {
       </section>
 
       {/* Writing */}
-      <section className='mb-12 anim-3'>
+      <section className='mb-8 anim-3'>
         <SectionHeading
           title='Writing'
           action={
