@@ -1,6 +1,7 @@
 import { ArrowUpRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import { experience, sideProjects } from '@/config/experience';
+import { TrackedLink } from '@/components/TrackedLink';
 
 export const metadata: Metadata = {
   title: 'Work — Hritik Singh',
@@ -53,14 +54,16 @@ export default function ProjectsPage() {
                   height={15}
                   className='rounded-full shrink-0 bg-white ring-[0.5px] ring-inset ring-black/[0.04] grayscale'
                 />
-                <a
+                <TrackedLink
                   href={item.href}
                   target='_blank'
                   rel='noopener noreferrer'
+                  event='employer_link_clicked'
+                  properties={{ company: item.company, location: 'projects' }}
                   className='text-[15px] font-medium text-ink hover:text-primary transition-colors shrink-0'
                 >
                   {item.company}
-                </a>
+                </TrackedLink>
                 <span className='text-sm text-muted truncate'>
                   {item.role}
                   {item.location ? ` · ${item.location}` : ''}
@@ -84,11 +87,13 @@ export default function ProjectsPage() {
 
         <div>
           {sideProjects.map((p) => (
-            <a
+            <TrackedLink
               key={p.title}
               href={p.href}
               target='_blank'
               rel='noopener noreferrer'
+              event='side_project_clicked'
+              properties={{ project: p.title, location: 'projects' }}
               className='group flex items-start justify-between py-3.5 -mx-3 px-3 rounded-lg hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60'
             >
               <div className='min-w-0 pr-4'>
@@ -100,7 +105,7 @@ export default function ProjectsPage() {
                 </p>
               </div>
               <ArrowUpRight className='w-4 h-4 text-muted/50 group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-0.5' />
-            </a>
+            </TrackedLink>
           ))}
         </div>
       </section>

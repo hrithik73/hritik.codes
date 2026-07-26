@@ -2,6 +2,7 @@
 
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import posthog from "posthog-js";
 import { useCallback, useEffect, useState } from "react";
 
 const CYCLE: Record<string, string> = {
@@ -66,6 +67,7 @@ export function ThemeSwitcher() {
     playClickSound();
     setIconKey((k) => k + 1);
     setTheme(next);
+    posthog.capture("theme_switched", { from: current, to: next });
   }, [theme, setTheme]);
 
   if (!mounted) {

@@ -1,3 +1,7 @@
+"use client";
+
+import posthog from "posthog-js";
+
 const socialLinks = [
   { name: "x", href: "https://x.com/hrithik73_" },
   { name: "github", href: "https://github.com/hrithik73" },
@@ -24,6 +28,12 @@ export function Footer() {
                   : "noopener noreferrer"
               }
               className="hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded"
+              onClick={() =>
+                posthog.capture("social_link_clicked", {
+                  platform: link.name,
+                  location: "footer",
+                })
+              }
             >
               {link.name}
             </a>
