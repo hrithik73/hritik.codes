@@ -4,6 +4,7 @@ import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import path from 'path';
 import { experience } from '@/config/experience';
+import { TrackedLink } from '@/components/TrackedLink';
 
 const recentWork = experience.slice(0, 4);
 
@@ -143,11 +144,13 @@ export default function Home() {
           {recentWork.map((item) => {
             const current = item.period.endsWith('Present');
             return (
-              <a
+              <TrackedLink
                 key={`${item.company}-${item.period}`}
                 href={item.href}
                 target='_blank'
                 rel='noopener noreferrer'
+                event='company_link_clicked'
+                properties={{ company: item.company, location: 'home' }}
                 className={`group flex items-center justify-between py-2.5 -mx-3 px-3 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
                   current
                     ? 'bg-surface ring-1 ring-line hover:ring-accent/40'
@@ -177,7 +180,7 @@ export default function Home() {
                 <span className='text-sm text-muted tabular-nums shrink-0 ml-4'>
                   {item.period}
                 </span>
-              </a>
+              </TrackedLink>
             );
           })}
         </div>
@@ -199,9 +202,11 @@ export default function Home() {
         <div>
           {posts.length > 0 ? (
             posts.map((post) => (
-              <Link
+              <TrackedLink
                 key={post.slug}
                 href={`/blog/${post.slug}`}
+                event='blog_post_clicked'
+                properties={{ slug: post.slug, location: 'home' }}
                 className='group flex items-center justify-between py-3 -mx-3 px-3 rounded-lg hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60'
               >
                 <span className='text-ink text-[15px]'>{post.title}</span>
@@ -216,7 +221,7 @@ export default function Home() {
                     aria-hidden='true'
                   />
                 </div>
-              </Link>
+              </TrackedLink>
             ))
           ) : (
             <p className='text-[15px] text-muted'>Nothing published yet.</p>
@@ -228,27 +233,36 @@ export default function Home() {
       <section className='anim-4'>
         <SectionHeading title='Say hello' />
         <div className='flex flex-wrap items-center gap-x-5 gap-y-2'>
-          <a href='mailto:shrithik404@gmail.com' className={inlineLink}>
+          <TrackedLink
+            href='mailto:shrithik404@gmail.com'
+            event='contact_email_clicked'
+            properties={{ location: 'home' }}
+            className={inlineLink}
+          >
             shrithik404@gmail.com
-          </a>
-          <a
+          </TrackedLink>
+          <TrackedLink
             href='https://x.com/hrithik73_'
             target='_blank'
             rel='noopener noreferrer'
+            event='homepage_social_link_clicked'
+            properties={{ platform: 'x', location: 'home' }}
             className='group inline-flex items-center gap-1 text-[15px] text-muted hover:text-ink transition-colors'
           >
             x
             <ArrowUpRight className='w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all' />
-          </a>
-          <a
+          </TrackedLink>
+          <TrackedLink
             href='https://linkedin.com/in/hrithik73'
             target='_blank'
             rel='noopener noreferrer'
+            event='homepage_social_link_clicked'
+            properties={{ platform: 'linkedin', location: 'home' }}
             className='group inline-flex items-center gap-1 text-[15px] text-muted hover:text-ink transition-colors'
           >
             linkedin
             <ArrowUpRight className='w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all' />
-          </a>
+          </TrackedLink>
         </div>
       </section>
     </div>
