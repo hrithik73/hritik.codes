@@ -128,6 +128,112 @@ h3 {
   animation: theme-icon-turn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Footer meadow: a faint breeze at rest, wind picks up and grass rises on hover */
+@property --sway {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+@keyframes meadow-sway {
+  0%,
+  100% {
+    transform: skewX(calc(var(--sway) * -1));
+  }
+  50% {
+    transform: skewX(var(--sway));
+  }
+}
+
+.meadow-layer {
+  --sway: 0.6deg;
+  transform-origin: 50% 100%;
+  scale: 1 0.88;
+  animation: meadow-sway 3.2s ease-in-out infinite;
+  transition:
+    --sway 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    scale 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.meadow-layer-mid {
+  animation-delay: -0.4s;
+}
+
+.meadow-layer-front {
+  animation-delay: -0.8s;
+  animation-duration: 2.6s;
+}
+
+@media (hover: hover) {
+  .site-footer:hover .meadow-layer {
+    --sway: 3deg;
+    scale: 1 1;
+  }
+
+  .site-footer:hover .meadow-layer-mid {
+    --sway: 4deg;
+    scale: 1 1.04;
+  }
+
+  .site-footer:hover .meadow-layer-front {
+    --sway: 5.5deg;
+    scale: 1 1.08;
+  }
+
+  .site-footer:hover .firefly {
+    scale: 1.5;
+  }
+}
+
+/* Dark mode: the same meadow at night, lit by a few accent fireflies */
+.dark .meadow-layer-back {
+  filter: brightness(0.38) saturate(0.6);
+}
+.dark .meadow-layer-mid {
+  filter: brightness(0.5) saturate(0.65);
+}
+.dark .meadow-layer-front {
+  filter: brightness(0.62) saturate(0.7);
+}
+
+@keyframes firefly-drift {
+  0%,
+  100% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  35% {
+    opacity: 0.9;
+  }
+  50% {
+    translate: 6px -9px;
+  }
+  70% {
+    opacity: 0.25;
+  }
+  85% {
+    opacity: 0.7;
+    translate: -4px -14px;
+  }
+}
+
+.firefly {
+  display: none;
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  background: var(--accent);
+  box-shadow: 0 0 6px 2px color-mix(in oklch, var(--accent) 55%, transparent);
+  pointer-events: none;
+  animation: firefly-drift 5s ease-in-out infinite;
+  transition: scale 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dark .firefly {
+  display: block;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,

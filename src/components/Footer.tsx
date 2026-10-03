@@ -1,3 +1,6 @@
+import { FooterClock } from "./FooterClock";
+import { Meadow } from "./Meadow";
+
 const socialLinks = [
   { name: "x", href: "https://x.com/hrithik73_" },
   { name: "github", href: "https://github.com/hrithik73" },
@@ -7,8 +10,8 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-line">
-      <div className="mx-auto max-w-2xl px-6 py-5 flex items-center justify-between">
+    <footer className="site-footer mt-2">
+      <div className="relative z-10 mx-auto max-w-2xl px-6 flex items-center justify-between gap-6">
         <nav
           aria-label="Social links"
           className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted"
@@ -23,16 +26,15 @@ export function Footer() {
                   ? undefined
                   : "noopener noreferrer"
               }
-              className="hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded"
+              className="underline decoration-transparent decoration-1 underline-offset-[5px] hover:text-ink hover:decoration-line transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded"
             >
               {link.name}
             </a>
           ))}
         </nav>
-        <span className="text-xs text-muted tabular-nums">
-          {new Date().getFullYear()}
-        </span>
+        <FooterClock />
       </div>
+      <Meadow className="-mt-7" />
     </footer>
   );
 }
