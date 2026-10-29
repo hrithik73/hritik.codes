@@ -11,18 +11,22 @@ const nav = [
 
 export function Header() {
   const pathname = usePathname();
+  // The home hero already says the name — don't say it twice
+  const home = pathname === "/";
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur-sm">
       <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-4">
-        <Link
-          href="/"
-          aria-label="Home"
-          className="font-display text-lg leading-none text-ink hover:opacity-70 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded"
-        >
-          hritik<span className="text-accent">.</span>
-        </Link>
-        <nav className="flex items-center gap-5">
+        {!home && (
+          <Link
+            href="/"
+            aria-label="Home"
+            className="font-display text-lg leading-none text-ink hover:opacity-70 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded"
+          >
+            hritik<span className="text-accent">.</span>
+          </Link>
+        )}
+        <nav className="ml-auto flex items-center gap-5">
           {nav.map((item) => {
             const active = pathname.startsWith(item.href);
             return (

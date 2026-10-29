@@ -6,10 +6,12 @@ import Link from 'next/link';
 import path from 'path';
 import { experience } from '@/config/experience';
 
-const recentWork = experience.slice(0, 4);
-
-const inlineLink =
-  'text-ink underline decoration-accent decoration-[1.5px] underline-offset-[3px] hover:decoration-primary transition-[text-decoration-color]';
+// One row per company — repeat stints live on /projects
+const recentWork = experience
+  .filter(
+    (item, i) => experience.findIndex((e) => e.company === item.company) === i,
+  )
+  .slice(0, 3);
 
 function getPosts() {
   const blogDir = path.join(process.cwd(), 'content/blog');
@@ -95,36 +97,13 @@ export default function Home() {
         </div>
         <Squiggle />
 
-        <p className='mt-6 text-base text-ink/90 leading-[1.75] max-w-lg'>
+        <p className='mt-6 text-base text-muted leading-[1.75] max-w-lg'>
           I build mobile apps — 5+ years of making things feel fast and smooth,
           currently at{' '}
-          <a
-            href='https://baazigames.com'
-            className={inlineLink}
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            BaaziGames
-          </a>
-          . Previously at{' '}
-          <a
-            href='https://bharatpe.com'
-            className={inlineLink}
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            BharatPe
-          </a>{' '}
-          and{' '}
-          <a
-            href='https://cars24.com'
-            className={inlineLink}
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            CARS24
-          </a>
-          .
+          <strong className='font-medium text-ink'>BaaziGames</strong>.
+          Previously at{' '}
+          <strong className='font-medium text-ink'>BharatPe</strong> and{' '}
+          <strong className='font-medium text-ink'>CARS24</strong>.
         </p>
       </section>
 
@@ -142,24 +121,19 @@ export default function Home() {
           }
         />
         <div>
-          {recentWork.map((item) => {
-            const current = item.period.endsWith('Present');
-            return (
-              <a
-                key={`${item.company}-${item.period}`}
-                href={item.href}
-                target='_blank'
-                rel='noopener noreferrer'
-                className={`group flex items-center justify-between py-2.5 -mx-3 px-3 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
-                  current
-                    ? 'bg-surface ring-1 ring-line hover:ring-accent/40'
-                    : 'hover:bg-surface'
-                }`}
-              >
+          {recentWork.map((item) => (
+            <a
+              key={`${item.company}-${item.period}`}
+              href={item.href}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='group block py-3 -mx-3 px-3 rounded-lg hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60'
+            >
+              <div className='flex items-center justify-between gap-4'>
                 <div className='flex items-center gap-2.5 min-w-0'>
                   <img
                     src={`/logos/${item.domain}.png`}
-                    alt={item.company}
+                    alt=''
                     width={18}
                     height={18}
                     className='rounded-full shrink-0 bg-white ring-[0.5px] ring-inset ring-black/[0.04] grayscale group-hover:grayscale-0 transition-[filter]'
@@ -170,23 +144,21 @@ export default function Home() {
                   <span className='text-muted text-sm truncate'>
                     {item.role}
                   </span>
-                  {current && (
-                    <span className='text-[11px] font-medium text-accent border border-accent/40 rounded-full px-1.5 py-0.5 leading-none shrink-0'>
-                      current
-                    </span>
-                  )}
                 </div>
-                <span className='text-sm text-muted tabular-nums shrink-0 ml-4'>
+                <span className='text-sm text-muted tabular-nums shrink-0'>
                   {item.period}
                 </span>
-              </a>
-            );
-          })}
+              </div>
+              <p className='mt-1 pl-7 text-sm text-muted leading-relaxed max-w-[60ch]'>
+                {item.note}
+              </p>
+            </a>
+          ))}
         </div>
       </section>
 
       {/* Writing */}
-      <section className='mb-8 anim-3'>
+      <section className='anim-3'>
         <SectionHeading
           title='Writing'
           action={
@@ -223,34 +195,6 @@ export default function Home() {
           ) : (
             <p className='text-[15px] text-muted'>Nothing published yet.</p>
           )}
-        </div>
-      </section>
-
-      {/* Contact */}
-      <section className='anim-4'>
-        <SectionHeading title='Say hello' />
-        <div className='flex flex-wrap items-center gap-x-5 gap-y-2'>
-          <a href='mailto:shrithik404@gmail.com' className={inlineLink}>
-            shrithik404@gmail.com
-          </a>
-          <a
-            href='https://x.com/hrithik73_'
-            target='_blank'
-            rel='noopener noreferrer'
-            className='group inline-flex items-center gap-1 text-[15px] text-muted hover:text-ink transition-colors'
-          >
-            x
-            <ArrowUpRight className='w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all' />
-          </a>
-          <a
-            href='https://linkedin.com/in/hrithik73'
-            target='_blank'
-            rel='noopener noreferrer'
-            className='group inline-flex items-center gap-1 text-[15px] text-muted hover:text-ink transition-colors'
-          >
-            linkedin
-            <ArrowUpRight className='w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all' />
-          </a>
         </div>
       </section>
     </div>
