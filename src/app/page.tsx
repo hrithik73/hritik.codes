@@ -1,6 +1,7 @@
 import fs from 'fs';
 import matter from 'gray-matter';
 import { ArrowUpRight } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import path from 'path';
 import { experience } from '@/config/experience';
@@ -80,11 +81,12 @@ export default function Home() {
       {/* Hero */}
       <section className='mb-10 anim-1'>
         <div className='flex items-end gap-4'>
-          <img
-            src='https://github.com/hrithik73.png'
+          <Image
+            src='/avatar.jpg'
             alt='Hritik Singh'
             width={52}
             height={52}
+            preload
             className='rounded-full shrink-0 mb-1 shadow-sm ring-1 ring-line'
           />
           <h1 className='font-display text-[clamp(2.2rem,7.5vw,3.25rem)] leading-none text-ink'>
@@ -156,7 +158,7 @@ export default function Home() {
               >
                 <div className='flex items-center gap-2.5 min-w-0'>
                   <img
-                    src={`https://www.google.com/s2/favicons?domain=${item.domain}&sz=64`}
+                    src={`/logos/${item.domain}.png`}
                     alt={item.company}
                     width={18}
                     height={18}

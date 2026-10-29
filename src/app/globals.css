@@ -147,6 +147,7 @@ h3 {
 
 .meadow-layer {
   --sway: 0.6deg;
+  background: repeat-x 0 0 / auto 100%;
   transform-origin: 50% 100%;
   scale: 1 0.88;
   animation: meadow-sway 3.2s ease-in-out infinite;
@@ -155,11 +156,17 @@ h3 {
     scale 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.meadow-layer-back {
+  background-image: url(/meadow/back);
+}
+
 .meadow-layer-mid {
+  background-image: url(/meadow/mid);
   animation-delay: -0.4s;
 }
 
 .meadow-layer-front {
+  background-image: url(/meadow/front);
   animation-delay: -0.8s;
   animation-duration: 2.6s;
 }

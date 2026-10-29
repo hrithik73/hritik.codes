@@ -1,8 +1,20 @@
 import fs from "fs";
 import matter from "gray-matter";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import path from "path";
 import { redis } from "@/lib/redis";
+
+export const revalidate = 60;
+
+const getViewCounts = unstable_cache(
+  (slugs: string[]) =>
+    redis
+      .mget<(number | null)[]>(...slugs.map((s) => `views:${s}`))
+      .catch(() => slugs.map(() => null)),
+  ["blog-views"],
+  { revalidate: 60 },
+);
 
 const blogDir = path.join(process.cwd(), "content/blog");
 
@@ -42,11 +54,7 @@ function getPosts() {
 export default async function BlogPage() {
   const posts = getPosts();
 
-  const viewCounts = await Promise.all(
-    posts.map((post) =>
-      redis.get<number>(`views:${post.slug}`).catch(() => null),
-    ),
-  );
+  const viewCounts = await getViewCounts(posts.map((p) => p.slug));
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-14 anim-page">

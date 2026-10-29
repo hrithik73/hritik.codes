@@ -47,7 +47,7 @@ export default function ProjectsPage() {
             <div className='flex items-baseline justify-between gap-4 mb-1.5'>
               <div className='flex items-center gap-2.5 min-w-0'>
                 <img
-                  src={`https://www.google.com/s2/favicons?domain=${item.domain}&sz=64`}
+                  src={`/logos/${item.domain}.png`}
                   alt=''
                   width={15}
                   height={15}
