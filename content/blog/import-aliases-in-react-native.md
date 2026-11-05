@@ -1,7 +1,7 @@
 ---
 title: Import Aliases in react-native
 date: 2023/09/19
-description: How to configure import aliases in react-native project.
+description: Set up import aliases like @src/components in React Native CLI and Expo projects using tsconfig paths and babel-plugin-module-resolver, so you can drop long ../../ imports.
 tag: react,react-native
 author: Hritik Singh
 ---

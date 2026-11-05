@@ -1,7 +1,7 @@
 ---
 title: How to create and publish your boilerplate in react-native
 date: 2023/09/21
-description: A detailed and clear guide on how to create a boilerplate
+description: Step-by-step guide to building your own React Native boilerplate with template.config.js, sharing it via GitHub or npm, and starting new apps from it with npx react-native init --template.
 tag: react,react-native , boilerplate , starter , rn-starter , app-dev
 author: Hritik Singh
 ---

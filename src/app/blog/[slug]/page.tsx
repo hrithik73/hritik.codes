@@ -8,6 +8,7 @@ import * as runtime from "react/jsx-runtime";
 import rehypePrettyCode from "rehype-pretty-code";
 import { ViewCounter } from "@/components/ViewCounter";
 import { useMDXComponents } from "@/mdx-components";
+import { siteUrl } from "~/config/site";
 
 const blogDir = path.join(process.cwd(), "content/blog");
 
@@ -77,6 +78,8 @@ export async function generateMetadata({
       title: post.title,
       description: post.description,
       type: "article",
+      publishedTime: String(post.date).replace(/\//g, "-"),
+      authors: [siteUrl],
       url: "./",
       images: "/opengraph-image",
     },
@@ -121,9 +124,24 @@ export default async function BlogPost({
   }
 
   const { MDXContent } = post;
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.description,
+    datePublished: String(post.date).replace(/\//g, "-"),
+    url: `${siteUrl}/blog/${slug}`,
+    image: `${siteUrl}/opengraph-image`,
+    author: { "@type": "Person", name: "Hritik Singh", url: siteUrl },
+  };
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-14 anim-page">
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD from our own frontmatter
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <article>
         <header className="mb-10">
           <h1 className="font-display text-[clamp(1.6rem,5vw,2.25rem)] text-ink mb-4 text-pretty leading-tight">
