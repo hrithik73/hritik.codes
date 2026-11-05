@@ -4,7 +4,7 @@ import { Meadow } from "./Meadow";
 
 const footerLinks = [
   ...socialLinks,
-  { name: "email", href: "mailto:shrithik404@gmail.com" },
+  { name: "hi@hritik.io", href: "mailto:hi@hritik.io" },
 ];
 
 export function Footer() {
