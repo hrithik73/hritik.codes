@@ -192,4 +192,4 @@ If you want `@src/components` then you can simply change `~/` to` @/`
 yarn start --reset-cache
 ```
 
-You are good to go, If you feel any issues please feel free to comment or reach out to me at [x.com/hrithik73\_](https://x.com/hrithik73_)
+You are good to go, If you feel any issues please feel free to comment or reach out to me at [x.com/hritik73\_](https://x.com/hritik73_)
