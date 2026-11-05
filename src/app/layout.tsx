@@ -5,6 +5,7 @@ import "./globals.css";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { siteUrl } from "~/config/site";
 
 const geist = Geist({
   variable: "--font-hanken",
@@ -16,10 +17,25 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const title = "Hritik Singh — React Native Developer";
+const description =
+  "I'm Hritik Singh, a React Native developer building fast, smooth mobile apps and my own products in public. SDE-2 at Baazi Games, ex-BharatPe and CARS24.";
+
+// "./" resolves against each route, so pages without their own canonical/og:url get the right one
 export const metadata: Metadata = {
-  title: "Hritik Singh — Mobile App Developer",
-  description:
-    "React Native developer with 5+ years building mobile apps at BaaziGames, BharatPe, and CARS24. I care about things feeling fast and smooth.",
+  metadataBase: new URL(siteUrl),
+  title,
+  description,
+  alternates: { canonical: "./" },
+  openGraph: {
+    title,
+    description,
+    url: "./",
+    siteName: "Hritik Singh",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: { card: "summary_large_image", creator: "@hritik73_" },
 };
 
 export const viewport: Viewport = {

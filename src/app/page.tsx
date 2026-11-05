@@ -5,6 +5,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import path from 'path';
 import { experience } from '@/config/experience';
+import { siteUrl, socialLinks } from '~/config/site';
+
+const personJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Hritik Singh',
+  url: siteUrl,
+  jobTitle: 'React Native Developer',
+  image: `${siteUrl}/avatar.jpg`,
+  sameAs: socialLinks.map((link) => link.href),
+};
 
 // One row per company — repeat stints live on /projects
 const recentWork = experience
@@ -80,6 +91,11 @@ export default function Home() {
 
   return (
     <div className='mx-auto max-w-2xl px-6 py-10'>
+      <script
+        type='application/ld+json'
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD, no user input
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
       {/* Hero */}
       <section className='mb-10 anim-1'>
         <div className='flex items-end gap-4'>
@@ -98,7 +114,8 @@ export default function Home() {
         <Squiggle />
 
         <p className='mt-6 text-base text-muted leading-[1.75] max-w-lg'>
-          I build mobile apps — 5+ years of making things feel fast and smooth,
+          I'm Hritik Singh, a React Native developer. I build mobile apps — 5+
+          years of making things feel fast and smooth,
           currently at{' '}
           <strong className='font-medium text-ink'>BaaziGames</strong>.
           Previously at{' '}

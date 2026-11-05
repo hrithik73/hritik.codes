@@ -77,12 +77,10 @@ export async function generateMetadata({
       title: post.title,
       description: post.description,
       type: "article",
+      url: "./",
+      images: "/opengraph-image",
     },
-    twitter: {
-      card: "summary",
-      title: post.title,
-      description: post.description,
-    },
+    // twitter card/creator come from the layout; title, description, image fill in from openGraph
   };
 }
 

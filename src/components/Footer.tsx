@@ -1,10 +1,9 @@
+import { socialLinks } from "~/config/site";
 import { FooterClock } from "./FooterClock";
 import { Meadow } from "./Meadow";
 
-const socialLinks = [
-  { name: "x", href: "https://x.com/hrithik73_" },
-  { name: "github", href: "https://github.com/hrithik73" },
-  { name: "linkedin", href: "https://linkedin.com/in/hrithik73" },
+const footerLinks = [
+  ...socialLinks,
   { name: "email", href: "mailto:shrithik404@gmail.com" },
 ];
 
@@ -16,7 +15,7 @@ export function Footer() {
           aria-label="Social links"
           className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted"
         >
-          {socialLinks.map((link) => (
+          {footerLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
@@ -24,7 +23,7 @@ export function Footer() {
               rel={
                 link.href.startsWith("mailto:")
                   ? undefined
-                  : "noopener noreferrer"
+                  : "me noopener noreferrer"
               }
               className="underline decoration-transparent decoration-1 underline-offset-[5px] hover:text-ink hover:decoration-line transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded"
             >

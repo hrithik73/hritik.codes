@@ -1,11 +1,17 @@
 import fs from "fs";
 import matter from "gray-matter";
+import type { Metadata } from "next";
 import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import path from "path";
 import { redis } from "@/lib/redis";
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: "Writing — Hritik Singh",
+  description: "Notes on React Native and mobile development by Hritik Singh.",
+};
 
 const getViewCounts = unstable_cache(
   (slugs: string[]) =>
