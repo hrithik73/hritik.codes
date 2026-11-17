@@ -1,5 +1,10 @@
-import { NextResponse } from "next/server";
+import { SeverityNumber } from "@opentelemetry/api-logs";
+import { after, NextResponse } from "next/server";
 import { redis } from "@/lib/redis";
+import {
+  posthogLogger,
+  posthogLoggerProvider,
+} from "../../../../../instrumentation";
 
 export async function GET(
   _req: Request,
@@ -16,5 +21,19 @@ export async function POST(
 ) {
   const { slug } = await params;
   const views = await redis.incr(`views:${slug}`);
+
+  posthogLogger?.emit({
+    body: "Blog view count incremented",
+    severityNumber: SeverityNumber.INFO,
+    attributes: {
+      event: "blog_view_count_incremented",
+      route: "/api/views/[slug]",
+      method: "POST",
+      total_views: views,
+    },
+  });
+
+  after(() => posthogLoggerProvider?.forceFlush().catch(() => {}));
+
   return NextResponse.json({ views });
 }
