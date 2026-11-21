@@ -16,7 +16,7 @@ export function FooterClock() {
   }, []);
 
   return (
-    <time className="inline-block min-w-[8ch] text-right font-display text-xs text-muted tabular-nums"
+    <time className="inline-block min-w-[8ch] text-right font-mono text-xs text-muted tabular-nums"
     >
       {time ?? "\u00a0"}
     </time>

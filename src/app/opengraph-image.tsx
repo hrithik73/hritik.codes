@@ -2,13 +2,13 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 
-export const alt = "Hritik Singh — React Native Developer";
+export const alt = "Hritik Singh — Product-minded Developer";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 // Dark theme tokens from globals.css, as hex for Satori
 export default async function OpengraphImage() {
-  const avatar = await readFile(path.join(process.cwd(), "public/avatar.jpg"));
+  const avatar = await readFile(path.join(process.cwd(), "public/avatar-v2.jpg"));
 
   return new ImageResponse(
     <div
@@ -52,7 +52,7 @@ export default async function OpengraphImage() {
             color: "#a8a8a8",
           }}
         >
-          <span>React Native Developer</span>
+          <span>Product-minded Developer</span>
           <span>hritik.io</span>
         </div>
       </div>

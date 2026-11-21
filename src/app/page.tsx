@@ -1,9 +1,9 @@
 import fs from 'fs';
 import matter from 'gray-matter';
 import { ArrowUpRight } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import path from 'path';
+import { PrintPhoto } from '@/components/PrintPhoto';
 import { experience } from '@/config/experience';
 import { siteUrl, socialLinks } from '~/config/site';
 
@@ -12,8 +12,8 @@ const personJsonLd = {
   '@type': 'Person',
   name: 'Hritik Singh',
   url: siteUrl,
-  jobTitle: 'React Native Developer',
-  image: `${siteUrl}/avatar.jpg`,
+  jobTitle: 'Product-minded Developer',
+  image: `${siteUrl}/avatar-v2.jpg`,
   sameAs: socialLinks.map((link) => link.href),
 };
 
@@ -58,7 +58,7 @@ function SectionHeading({
   action?: React.ReactNode;
 }) {
   return (
-    <div className='flex items-baseline justify-between mb-4'>
+    <div className='flex items-baseline justify-between mb-2'>
       <h2 className='font-display text-xl text-ink'>{title}</h2>
       {action}
     </div>
@@ -90,42 +90,38 @@ export default function Home() {
   const posts = getPosts();
 
   return (
-    <div className='mx-auto max-w-2xl px-6 py-10'>
+    <div className='mx-auto max-w-2xl px-6 pt-12 pb-16'>
       <script
         type='application/ld+json'
         // biome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD, no user input
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
       />
       {/* Hero */}
-      <section className='mb-10 anim-1'>
-        <div className='flex items-end gap-4'>
-          <Image
-            src='/avatar.jpg'
-            alt='Hritik Singh'
-            width={52}
-            height={52}
-            preload
-            className='rounded-full shrink-0 mb-1 shadow-sm ring-1 ring-line'
-          />
-          <h1 className='font-display text-[clamp(2.2rem,7.5vw,3.25rem)] leading-none text-ink'>
-            Hritik Singh
-          </h1>
-        </div>
-        <Squiggle />
+      <section className='mb-14 anim-1'>
+        <div className='flex flex-col-reverse gap-8 sm:flex-row sm:items-start sm:justify-between sm:gap-10'>
+          <div className='min-w-0 max-w-[65ch]'>
+            <h1 className='font-display text-[clamp(2rem,8vw,2.75rem)] leading-[1.1] text-ink'>
+              Hritik Singh
+            </h1>
+            <Squiggle />
 
-        <p className='mt-6 text-base text-muted leading-[1.75] max-w-lg'>
-          I'm Hritik Singh, a React Native developer. I build mobile apps — 5+
-          years of making things feel fast and smooth,
-          currently at{' '}
-          <strong className='font-medium text-ink'>BaaziGames</strong>.
-          Previously at{' '}
-          <strong className='font-medium text-ink'>BharatPe</strong> and{' '}
-          <strong className='font-medium text-ink'>CARS24</strong>.
-        </p>
+            <p className='mt-6 text-base text-muted leading-[1.75] text-pretty'>
+              Hey <span aria-hidden='true'>👋</span>, I am Hritik, an output-oriented developer with a product mindset.
+              5+ years of building good products used by thousands to millions of
+              people, currently at{' '}
+              <strong className='font-medium text-ink'>BaaziGames</strong>.
+              Previously at{' '}
+              <strong className='font-medium text-ink'>BharatPe</strong> and{' '}
+              <strong className='font-medium text-ink'>CARS24</strong>.
+            </p>
+          </div>
+
+          <PrintPhoto />
+        </div>
       </section>
 
       {/* Work */}
-      <section className='mb-8 anim-2'>
+      <section className='mb-14 anim-2'>
         <SectionHeading
           title='Work'
           action={
@@ -144,7 +140,7 @@ export default function Home() {
               href={item.href}
               target='_blank'
               rel='noopener noreferrer'
-              className='group block py-3 -mx-3 px-3 rounded-lg hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60'
+              className='group block py-3.5 -mx-3 px-3 rounded-lg hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60'
             >
               <div className='flex items-center justify-between gap-4'>
                 <div className='flex items-center gap-2.5 min-w-0'>
@@ -166,7 +162,7 @@ export default function Home() {
                   {item.period}
                 </span>
               </div>
-              <p className='mt-1 pl-7 text-sm text-muted leading-relaxed max-w-[60ch]'>
+              <p className='mt-1.5 pl-7 text-sm text-muted leading-relaxed max-w-[60ch]'>
                 {item.note}
               </p>
             </a>

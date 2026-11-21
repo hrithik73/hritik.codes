@@ -8,18 +8,18 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { siteUrl } from "~/config/site";
 
 const geist = Geist({
-  variable: "--font-hanken",
+  variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-young-serif",
+  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
-const title = "Hritik Singh — React Native Developer";
+const title = "Hritik Singh — Product-minded Developer";
 const description =
-  "I'm Hritik Singh, a React Native developer building fast, smooth mobile apps and my own products in public. SDE-2 at Baazi Games, ex-BharatPe and CARS24.";
+  "I'm Hritik Singh, an output-oriented developer with a product mindset. 5+ years building products used by thousands to millions of people. SDE-2 at Baazi Games, ex-BharatPe and CARS24.";
 
 // "./" resolves against each route, so pages without their own canonical/og:url get the right one
 export const metadata: Metadata = {
