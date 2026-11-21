@@ -7,6 +7,7 @@ import { ThemeSwitcher } from "./ThemeSwitcher";
 const nav = [
   { label: "work", href: "/projects" },
   { label: "writing", href: "/blog" },
+  { label: "uses", href: "/uses" },
 ];
 
 export function Header() {

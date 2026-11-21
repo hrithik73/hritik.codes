@@ -9,7 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .filter((file) => /\.mdx?$/.test(file))
     .map((file) => `/blog/${file.replace(/\.mdx?$/, "")}`);
 
-  return ["", "/projects", "/blog", ...posts].map((route) => ({
+  return ["", "/projects", "/blog", "/uses", ...posts].map((route) => ({
     url: `${siteUrl}${route}`,
   }));
 }
