@@ -1,10 +1,7 @@
 import { SeverityNumber } from "@opentelemetry/api-logs";
 import { after, NextResponse } from "next/server";
-import { redis } from "@/lib/redis";
-import {
-  posthogLogger,
-  posthogLoggerProvider,
-} from "../../../../../instrumentation";
+import { posthogLogger, posthogLoggerProvider } from "~/lib/posthog-logger";
+import { redis } from "~/lib/redis";
 
 export async function GET(
   _req: Request,

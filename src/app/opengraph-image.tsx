@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import path from "node:path";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
 export const alt = "Hritik Singh — Product-minded Developer";
@@ -8,7 +8,7 @@ export const contentType = "image/png";
 
 // Dark theme tokens from globals.css, as hex for Satori
 export default async function OpengraphImage() {
-  const avatar = await readFile(path.join(process.cwd(), "public/avatar-v2.jpg"));
+  const avatar = await readFile(join(process.cwd(), "public/avatar-v2.jpg"));
 
   return new ImageResponse(
     <div

@@ -1,13 +1,9 @@
-import fs from "node:fs";
-import path from "node:path";
 import type { MetadataRoute } from "next";
 import { siteUrl } from "~/config/site";
+import { getPostSlugs } from "~/lib/posts";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const posts = fs
-    .readdirSync(path.join(process.cwd(), "content/blog"))
-    .filter((file) => /\.mdx?$/.test(file))
-    .map((file) => `/blog/${file.replace(/\.mdx?$/, "")}`);
+  const posts = getPostSlugs().map((slug) => `/blog/${slug}`);
 
   return ["", "/projects", "/blog", "/uses", ...posts].map((route) => ({
     url: `${siteUrl}${route}`,

@@ -1,8 +1,9 @@
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
+// next/image only ships a default export.
 import Image from "next/image";
-import { WavyRule } from "@/components/WavyRule";
-import { gear, software, type UsesItem } from "@/config/uses";
+import { WavyRule } from "~/components/wavy-rule";
+import { gear, software, type UsesItem } from "~/config/uses";
 
 export const metadata: Metadata = {
   title: "Uses — Hritik Singh",

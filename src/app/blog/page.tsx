@@ -1,10 +1,9 @@
-import fs from "fs";
-import matter from "gray-matter";
 import type { Metadata } from "next";
 import { unstable_cache } from "next/cache";
+// next/link only ships a default export.
 import Link from "next/link";
-import path from "path";
-import { redis } from "@/lib/redis";
+import { formatPostDate, getPosts } from "~/lib/posts";
+import { redis } from "~/lib/redis";
 
 export const revalidate = 60;
 
@@ -22,44 +21,8 @@ const getViewCounts = unstable_cache(
   { revalidate: 60 },
 );
 
-const blogDir = path.join(process.cwd(), "content/blog");
-
-function formatDate(dateString: string) {
-  const date = new Date(dateString.replace(/\//g, "-"));
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function getPosts() {
-  if (!fs.existsSync(blogDir)) {
-    return [];
-  }
-
-  const files = fs.readdirSync(blogDir);
-
-  return files
-    .filter((file) => file.endsWith(".md") || file.endsWith(".mdx"))
-    .map((file) => {
-      const filePath = path.join(blogDir, file);
-      const fileContents = fs.readFileSync(filePath, "utf8");
-      const { data } = matter(fileContents);
-
-      return {
-        slug: file.replace(/\.(md|mdx)$/, ""),
-        title: data.title,
-        date: data.date,
-        description: data.description,
-      };
-    })
-    .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-}
-
 export default async function BlogPage() {
   const posts = getPosts();
-
   const viewCounts = await getViewCounts(posts.map((p) => p.slug));
 
   return (
@@ -69,27 +32,30 @@ export default async function BlogPage() {
       </header>
 
       <div>
-        {posts.map((post, i) => (
-          <Link
-            key={post.slug}
-            href={`/blog/${post.slug}`}
-            className="group flex items-baseline justify-between py-2.5 -mx-3 px-3 rounded-lg hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-          >
-            <span className="text-ink text-[15px]">{post.title}</span>
-            <span className="flex items-baseline gap-3 ml-4 shrink-0">
-              {viewCounts[i] != null && (
-                <span className="text-sm text-muted tabular-nums">
-                  {(viewCounts[i] as number).toLocaleString()}
-                </span>
-              )}
-              {post.date && (
-                <span className="text-sm text-muted tabular-nums">
-                  {formatDate(post.date)}
-                </span>
-              )}
-            </span>
-          </Link>
-        ))}
+        {posts.map((post, i) => {
+          const views = viewCounts[i];
+          return (
+            <Link
+              key={post.slug}
+              href={`/blog/${post.slug}`}
+              className="group flex items-baseline justify-between py-2.5 -mx-3 px-3 rounded-lg hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+            >
+              <span className="text-ink text-[15px]">{post.title}</span>
+              <span className="flex items-baseline gap-3 ml-4 shrink-0">
+                {views != null && (
+                  <span className="text-sm text-muted tabular-nums">
+                    {views.toLocaleString()}
+                  </span>
+                )}
+                {post.date && (
+                  <span className="text-sm text-muted tabular-nums">
+                    {formatPostDate(post.date)}
+                  </span>
+                )}
+              </span>
+            </Link>
+          );
+        })}
 
         {posts.length === 0 && (
           <p className="text-muted py-8 text-center">No posts yet.</p>

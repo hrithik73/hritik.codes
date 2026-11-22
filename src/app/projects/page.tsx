@@ -1,20 +1,20 @@
-import { ArrowUpRight } from 'lucide-react';
-import type { Metadata } from 'next';
-import { WavyRule } from '@/components/WavyRule';
-import { experience, sideProjects } from '@/config/experience';
+import { ArrowUpRight } from "lucide-react";
+import type { Metadata } from "next";
+import { WavyRule } from "~/components/wavy-rule";
+import { experience, sideProjects } from "~/config/experience";
 
 export const metadata: Metadata = {
-  title: 'Work — Hritik Singh',
+  title: "Work — Hritik Singh",
   description: "Places I've worked and things I've built.",
 };
 
 export default function ProjectsPage() {
   return (
-    <div className='mx-auto max-w-2xl px-6 py-14 anim-page'>
+    <div className="mx-auto max-w-2xl px-6 py-14 anim-page">
       {/* Header */}
-      <div className='mb-12'>
-        <h1 className='font-display text-3xl text-ink mb-2'>Work</h1>
-        <p className='text-[15px] text-muted'>
+      <div className="mb-12">
+        <h1 className="font-display text-3xl text-ink mb-2">Work</h1>
+        <p className="text-[15px] text-muted">
           Places I've been, things I've built.
         </p>
       </div>
@@ -24,35 +24,35 @@ export default function ProjectsPage() {
         {experience.map((item, i) => (
           <div
             key={`${item.company}-${item.period}`}
-            className={`py-5 ${i < experience.length - 1 ? 'border-b border-line' : ''}`}
+            className={`py-5 ${i < experience.length - 1 ? "border-b border-line" : ""}`}
           >
-            <div className='flex items-baseline justify-between gap-4 mb-1.5'>
-              <div className='flex items-center gap-2.5 min-w-0'>
+            <div className="flex items-baseline justify-between gap-4 mb-1.5">
+              <div className="flex items-center gap-2.5 min-w-0">
                 <img
                   src={`/logos/${item.domain}.png`}
-                  alt=''
+                  alt=""
                   width={15}
                   height={15}
-                  className='rounded-full shrink-0 bg-white ring-[0.5px] ring-inset ring-black/[0.04] grayscale'
+                  className="rounded-full shrink-0 bg-white ring-[0.5px] ring-inset ring-black/[0.04] grayscale"
                 />
                 <a
                   href={item.href}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='text-[15px] font-medium text-ink hover:text-primary transition-colors shrink-0'
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[15px] font-medium text-ink hover:text-primary transition-colors shrink-0"
                 >
                   {item.company}
                 </a>
-                <span className='text-sm text-muted truncate'>
+                <span className="text-sm text-muted truncate">
                   {item.role}
-                  {item.location ? ` · ${item.location}` : ''}
+                  {item.location ? ` · ${item.location}` : ""}
                 </span>
               </div>
-              <span className='text-sm text-muted tabular-nums shrink-0'>
+              <span className="text-sm text-muted tabular-nums shrink-0">
                 {item.period}
               </span>
             </div>
-            <p className='text-sm text-muted leading-relaxed pl-[23px] max-w-[60ch]'>
+            <p className="text-sm text-muted leading-relaxed pl-[23px] max-w-[60ch]">
               {item.note}
             </p>
           </div>
@@ -62,26 +62,26 @@ export default function ProjectsPage() {
       {/* Side projects */}
       <section>
         <WavyRule />
-        <h2 className='font-display text-xl text-ink mb-4'>Side projects</h2>
+        <h2 className="font-display text-xl text-ink mb-4">Side projects</h2>
 
         <div>
           {sideProjects.map((p) => (
             <a
               key={p.title}
               href={p.href}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='group flex items-start justify-between py-3.5 -mx-3 px-3 rounded-lg hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60'
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-start justify-between py-3.5 -mx-3 px-3 rounded-lg hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
             >
-              <div className='min-w-0 pr-4'>
-                <span className='text-[15px] font-medium text-ink group-hover:text-primary transition-colors'>
+              <div className="min-w-0 pr-4">
+                <span className="text-[15px] font-medium text-ink group-hover:text-primary transition-colors">
                   {p.title}
                 </span>
-                <p className='text-sm text-muted leading-snug mt-0.5 max-w-[60ch]'>
+                <p className="text-sm text-muted leading-snug mt-0.5 max-w-[60ch]">
                   {p.note}
                 </p>
               </div>
-              <ArrowUpRight className='w-4 h-4 text-muted/50 group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-0.5' />
+              <ArrowUpRight className="w-4 h-4 text-muted/50 group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-0.5" />
             </a>
           ))}
         </div>

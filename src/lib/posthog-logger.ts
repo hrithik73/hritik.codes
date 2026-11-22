@@ -42,5 +42,3 @@ export const posthogLoggerProvider =
 
 export const posthogLogger =
   posthogLoggerProvider?.getLogger("portfolio.posthog");
-
-export function register() {}

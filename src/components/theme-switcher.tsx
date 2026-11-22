@@ -2,8 +2,9 @@
 
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import posthog from "posthog-js";
-import { useCallback, useEffect, useState } from "react";
+import { posthog } from "posthog-js";
+import { useState } from "react";
+import { useIsClient } from "~/lib/use-is-client";
 
 const CYCLE: Record<string, string> = {
   system: "light",
@@ -22,20 +23,20 @@ const CLICK_DURATION = 0.035;
 // One shared context: creating a new AudioContext per click means the audio
 // device has to spin up every time, and that startup latency often swallows
 // the entire 35ms click — which is why the sound was intermittent.
-let audioCtx: AudioContext | null = null;
-let clickBuffer: AudioBuffer | null = null;
+let audio: { ctx: AudioContext; buffer: AudioBuffer } | null = null;
 
 function getAudio() {
-  if (!audioCtx) {
-    audioCtx = new AudioContext();
-    const size = Math.floor(audioCtx.sampleRate * CLICK_DURATION);
-    clickBuffer = audioCtx.createBuffer(1, size, audioCtx.sampleRate);
-    const data = clickBuffer.getChannelData(0);
+  if (!audio) {
+    const ctx = new AudioContext();
+    const size = Math.floor(ctx.sampleRate * CLICK_DURATION);
+    const buffer = ctx.createBuffer(1, size, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
     for (let i = 0; i < size; i++) {
-      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / size, 10);
+      data[i] = (Math.random() * 2 - 1) * (1 - i / size) ** 10;
     }
+    audio = { ctx, buffer };
   }
-  return { ctx: audioCtx, buffer: clickBuffer! };
+  return audio;
 }
 
 function scheduleClick(ctx: AudioContext, buffer: AudioBuffer) {
@@ -67,7 +68,6 @@ function scheduleClick(ctx: AudioContext, buffer: AudioBuffer) {
 }
 
 function playClickSound() {
-  if (typeof window === "undefined") return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   try {
     const { ctx, buffer } = getAudio();
@@ -85,29 +85,25 @@ function playClickSound() {
 
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  // The stored theme is only known on the client; render a same-size
+  // placeholder until hydration so server and client markup match.
+  const isClient = useIsClient();
   const [iconKey, setIconKey] = useState(0);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const handleClick = useCallback(() => {
-    const current = theme ?? "system";
-    const next = CYCLE[current] ?? "light";
-    playClickSound();
-    setIconKey((k) => k + 1);
-    setTheme(next);
-    posthog.capture("theme_preference_changed", {
-      theme: next,
-    });
-  }, [theme, setTheme]);
-
-  if (!mounted) {
+  if (!isClient) {
     return <div className="w-8 h-8" />;
   }
 
   const current = theme ?? "system";
+
+  function handleClick() {
+    const next = CYCLE[current] ?? "light";
+    playClickSound();
+    setIconKey((k) => k + 1);
+    setTheme(next);
+    posthog.capture("theme_preference_changed", { theme: next });
+  }
+
   const Icon = current === "dark" ? Moon : current === "light" ? Sun : Monitor;
 
   return (

@@ -1,11 +1,12 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import type { ReactNode } from "react";
+import { Footer } from "~/components/footer";
+import { Header } from "~/components/header";
+import { ThemeProvider } from "~/components/theme-provider";
 import { siteUrl } from "~/config/site";
+import "./globals.css";
 
 const geist = Geist({
   variable: "--font-geist-sans",
@@ -48,7 +49,7 @@ export const viewport: Viewport = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>

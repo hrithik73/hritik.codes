@@ -1,3 +1,4 @@
+// @next/mdx is CommonJS (`export =`) with no named exports.
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 

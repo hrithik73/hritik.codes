@@ -1,4 +1,4 @@
-import type { StackItem } from "@/config/stack";
+import type { StackItem } from "~/config/stack";
 
 // Relative luminance of a "RRGGBB" hex, 0 (black) – 1 (white).
 function luminance(hex: string) {

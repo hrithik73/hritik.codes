@@ -1,8 +1,9 @@
 "use client";
 
+// next/link only ships a default export.
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ThemeSwitcher } from "./ThemeSwitcher";
+import { ThemeSwitcher } from "./theme-switcher";
 
 const nav = [
   { label: "work", href: "/projects" },
