@@ -21,12 +21,23 @@ const icons: Record<string, ReactNode> = {
   linkedin: <Linkedin className="size-3.5" aria-hidden="true" />,
 };
 
+// Icon colour on hover. X and GitHub are black brands, so they just take ink
+// from the link's own hover state.
+const hoverColors: Record<string, string> = {
+  linkedin: "group-hover:text-[#0A66C2]",
+};
+
 const footerLinks = [
-  ...socialLinks.map((l) => ({ ...l, icon: icons[l.name] })),
+  ...socialLinks.map((l) => ({
+    ...l,
+    icon: icons[l.name],
+    hoverColor: hoverColors[l.name] ?? "",
+  })),
   {
     name: "hi@hritik.io",
     href: "mailto:hi@hritik.io",
     icon: <Mail className="size-3.5" aria-hidden="true" />,
+    hoverColor: "group-hover:text-accent",
   },
 ];
 
@@ -57,9 +68,13 @@ export function Footer() {
 
                   posthog.capture("social_profile_clicked");
                 }}
-                className="inline-flex items-center gap-1.5 underline decoration-transparent decoration-1 underline-offset-[5px] hover:text-ink hover:decoration-line transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded"
+                className="group inline-flex items-center gap-1.5 underline decoration-transparent decoration-1 underline-offset-[5px] hover:text-ink hover:decoration-line transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded"
               >
-                {link.icon}
+                <span
+                  className={`inline-flex transition-colors ${link.hoverColor}`}
+                >
+                  {link.icon}
+                </span>
                 {link.name}
               </a>
             );
