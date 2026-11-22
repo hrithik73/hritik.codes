@@ -658,3 +658,161 @@ pre[data-theme] .line[data-highlighted="true"],
 pre[data-theme] .line--highlighted {
   background: color-mix(in oklch, var(--accent) 14%, transparent);
 }
+
+/*
+ * /books shelves. A flex-wrap row of books where every line is exactly one
+ * --row tall, so a background gradient repeating every --row draws a plank
+ * under each line, however many lines the list wraps onto. Books stand on the
+ * plank's top face at their true proportions; a library tag sits below.
+ */
+.shelf {
+  --book-h: 8.5rem;
+  --head: 1.25rem; /* room above for the hover lift */
+  --label: 4.25rem;
+
+  /* Look of the shelf: a backdrop behind the books, then up to two bands
+     under them (top face, front edge) and a fading shade. The default is
+     "cubby"; the debug menu previews the others via <html data-shelf>. */
+  --backdrop: var(--surface);
+  --top: 0px;
+  --plank-top: var(--line);
+  --front: 1px;
+  --plank-front: var(--line);
+  --shade: 0px;
+  --plank-shade: transparent;
+  --book-shadow: 0 1px 2px oklch(0 0 0 / 0.12), 0 6px 14px -10px oklch(0 0 0 / 0.35);
+
+  --plank-at: calc(var(--head) + var(--book-h));
+  --plank-end: calc(var(--plank-at) + var(--top) + var(--front));
+  --row: calc(var(--plank-end) + var(--label));
+
+  /* The plank runs a little past the outermost books, like a real shelf */
+  margin-inline: -0.75rem;
+  padding-inline: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.25rem;
+  row-gap: 0;
+  background-image: linear-gradient(
+    to bottom,
+    var(--backdrop) var(--plank-at),
+    var(--plank-top) var(--plank-at) calc(var(--plank-at) + var(--top)),
+    var(--plank-front) calc(var(--plank-at) + var(--top)) var(--plank-end),
+    var(--plank-shade) var(--plank-end),
+    transparent calc(var(--plank-end) + var(--shade))
+  );
+  background-size: 100% var(--row);
+}
+[data-shelf="ledge"] .shelf {
+  --backdrop: transparent;
+  --top: 1px;
+  --front: 8px;
+  --plank-front: var(--surface);
+}
+[data-shelf="hairline"] .shelf {
+  --backdrop: transparent;
+  --top: 0px;
+  --front: 1px;
+  --plank-front: var(--line);
+}
+[data-shelf="accent"] .shelf {
+  --backdrop: transparent;
+  --top: 0px;
+  --front: 2px;
+  --plank-front: var(--accent);
+}
+/* Plank: a real shelf in perspective. The top face darkens toward the wall,
+   a lit lip runs along its front, then the front face and a soft shadow
+   below. Books sink a few px into the top face so they stand on it. */
+[data-shelf="plank"] .shelf {
+  --top: 9px;
+  --front: 10px;
+  --shade: 16px;
+  --pk-back: color-mix(in oklab, var(--line), var(--ink) 12%);
+  --pk-top: color-mix(in oklab, var(--line), var(--bg) 35%);
+  --pk-lip: var(--bg);
+  --pk-front: var(--line);
+  --pk-bottom: color-mix(in oklab, var(--line), var(--ink) 18%);
+  --pk-shade: oklch(0 0 0 / 0.1);
+  --book-shadow: 0 2px 3px -1px oklch(0 0 0 / 0.3), 0 10px 20px -12px oklch(0 0 0 / 0.45);
+  background-image: linear-gradient(
+    to bottom,
+    transparent var(--plank-at),
+    var(--pk-back) var(--plank-at),
+    var(--pk-top) calc(var(--plank-at) + var(--top)),
+    var(--pk-lip) calc(var(--plank-at) + var(--top)),
+    var(--pk-lip) calc(var(--plank-at) + var(--top) + 1px),
+    var(--pk-front) calc(var(--plank-at) + var(--top) + 1px),
+    var(--pk-front) calc(var(--plank-end) - 1px),
+    var(--pk-bottom) calc(var(--plank-end) - 1px),
+    var(--pk-bottom) var(--plank-end),
+    var(--pk-shade) var(--plank-end),
+    transparent calc(var(--plank-end) + var(--shade))
+  );
+}
+.dark[data-shelf="plank"] .shelf {
+  --pk-back: color-mix(in oklab, var(--line), var(--bg) 60%);
+  --pk-top: var(--line);
+  --pk-lip: color-mix(in oklab, var(--line), var(--ink) 28%);
+  --pk-front: color-mix(in oklab, var(--line), var(--bg) 20%);
+  --pk-bottom: color-mix(in oklab, var(--line), var(--bg) 65%);
+  --pk-shade: oklch(0 0 0 / 0.45);
+}
+[data-shelf="plank"] .shelf-book {
+  top: 4px;
+}
+@media (min-width: 640px) {
+  .shelf {
+    --book-h: 10rem;
+    column-gap: 1.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .shelf {
+    --book-h: 11.5rem;
+    column-gap: 2rem;
+  }
+}
+
+.shelf > li {
+  height: var(--row);
+}
+.shelf-slot {
+  display: grid;
+  height: 100%;
+  grid-template-rows: var(--head) var(--book-h) calc(var(--top) + var(--front)) 1fr;
+}
+.shelf-book {
+  grid-row: 2;
+  position: relative;
+  display: block;
+  height: var(--book-h);
+  overflow: hidden;
+  border-radius: 2px 3px 3px 2px;
+  box-shadow: var(--book-shadow);
+  transition: translate 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Spine: a crease of shadow then light along the left edge */
+.shelf-book::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    oklch(0 0 0 / 0.18) 0,
+    oklch(1 0 0 / 0.16) 3px,
+    oklch(0 0 0 / 0.06) 7px,
+    transparent 12px
+  );
+  box-shadow: inset 0 0 0 1px oklch(0 0 0 / 0.08);
+}
+.shelf-slot:hover .shelf-book,
+.shelf-slot:focus-visible .shelf-book {
+  translate: 0 -6px;
+}
+.shelf-label {
+  grid-row: 4;
+  padding-top: 0.6rem;
+}

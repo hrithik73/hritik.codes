@@ -5,6 +5,7 @@
 
 export const DEBUG_ENABLED_KEY = "debug:enabled";
 export const DARK_PALETTE_KEY = "debug:dark-palette";
+export const SHELF_KEY = "debug:shelf";
 
 /** The plain `.dark` tokens; selecting it removes the attribute. */
 export const DEFAULT_DARK_PALETTE = "midnight";
@@ -49,5 +50,19 @@ export const DARK_PALETTES: DarkPalette[] = [
   },
 ];
 
-/** Runs in <head> before first paint so a saved palette doesn't flash. */
-export const darkPaletteScript = `try{var p=localStorage.getItem(${JSON.stringify(DARK_PALETTE_KEY)});if(p)document.documentElement.setAttribute("data-dark-palette",p)}catch(e){}`;
+/** The plain `.shelf` look in globals.css; selecting it removes the attribute. */
+export const DEFAULT_SHELF = "cubby";
+
+export type ShelfStyle = { id: string; label: string; note: string };
+
+// Styles for each live in globals.css under [data-shelf="…"] .shelf
+export const SHELF_STYLES: ShelfStyle[] = [
+  { id: "cubby", label: "Cubby", note: "default" },
+  { id: "ledge", label: "Ledge", note: "surface band" },
+  { id: "hairline", label: "Hairline", note: "1px rule" },
+  { id: "accent", label: "Accent", note: "accent lip" },
+  { id: "plank", label: "Plank", note: "3D" },
+];
+
+/** Runs in <head> before first paint so saved previews don't flash. */
+export const debugPrePaintScript = `try{var r=document.documentElement,p=localStorage.getItem(${JSON.stringify(DARK_PALETTE_KEY)}),s=localStorage.getItem(${JSON.stringify(SHELF_KEY)});if(p)r.setAttribute("data-dark-palette",p);if(s)r.setAttribute("data-shelf",s)}catch(e){}`;

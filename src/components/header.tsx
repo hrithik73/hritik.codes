@@ -3,6 +3,7 @@
 // next/link only ships a default export.
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { usePageWidth } from "~/lib/use-page-width";
 import { ThemeSwitcher } from "./theme-switcher";
 import { useWeather, WeatherChip } from "./weather";
 
@@ -10,6 +11,7 @@ const nav = [
   { label: "work", href: "/projects" },
   { label: "writing", href: "/blog" },
   { label: "uses", href: "/uses" },
+  { label: "books", href: "/books" },
 ];
 
 export function Header() {
@@ -17,10 +19,13 @@ export function Header() {
   // The home hero already says the name — don't say it twice
   const home = pathname === "/";
   const weather = useWeather();
+  const width = usePageWidth();
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-4">
+      <div
+        className={`mx-auto flex ${width} items-center justify-between px-6 py-4`}
+      >
         {!home && (
           <Link
             href="/"

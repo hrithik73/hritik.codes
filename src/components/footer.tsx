@@ -4,6 +4,7 @@ import { Github, Linkedin, Mail } from "lucide-react";
 import type { ReactNode } from "react";
 import { socialLinks } from "~/config/site";
 import { capture } from "~/lib/analytics";
+import { usePageWidth } from "~/lib/use-page-width";
 import { FooterClock } from "./footer-clock";
 import { Meadow } from "./meadow";
 import { useWeather, WeatherFx, weatherAttributes } from "./weather";
@@ -49,6 +50,7 @@ const footerLinks = [
 
 export function Footer() {
   const weather = useWeather();
+  const width = usePageWidth();
 
   return (
     <footer
@@ -56,7 +58,9 @@ export function Footer() {
       {...weatherAttributes(weather)}
     >
       {weather && <WeatherFx weather={weather} />}
-      <div className="relative z-10 mx-auto max-w-2xl px-6 flex items-center justify-between gap-6">
+      <div
+        className={`relative z-10 mx-auto ${width} px-6 flex items-center justify-between gap-6`}
+      >
         <nav
           aria-label="Social links"
           className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted"

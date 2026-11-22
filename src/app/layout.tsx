@@ -7,7 +7,7 @@ import { Footer } from "~/components/footer";
 import { Header } from "~/components/header";
 import { ThemeProvider } from "~/components/theme-provider";
 import { siteUrl } from "~/config/site";
-import { darkPaletteScript } from "~/lib/debug";
+import { debugPrePaintScript } from "~/lib/debug";
 import "./globals.css";
 
 const geist = Geist({
@@ -58,7 +58,7 @@ export default function RootLayout({
       <head>
         {/* Static string from our own config: applies a previewed dark palette before paint */}
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: trusted constant */}
-        <script dangerouslySetInnerHTML={{ __html: darkPaletteScript }} />
+        <script dangerouslySetInnerHTML={{ __html: debugPrePaintScript }} />
       </head>
       <body
         className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}

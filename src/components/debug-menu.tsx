@@ -8,6 +8,9 @@ import {
   DARK_PALETTES,
   DEBUG_ENABLED_KEY,
   DEFAULT_DARK_PALETTE,
+  DEFAULT_SHELF,
+  SHELF_KEY,
+  SHELF_STYLES,
 } from "~/lib/debug";
 
 /*
@@ -28,6 +31,7 @@ function readEnabled() {
     if (param === "0" || param === "off") {
       localStorage.removeItem(DEBUG_ENABLED_KEY);
       applyPalette(DEFAULT_DARK_PALETTE);
+      applyShelf(DEFAULT_SHELF);
     } else if (param !== null) {
       localStorage.setItem(DEBUG_ENABLED_KEY, "1");
     }
@@ -64,7 +68,28 @@ const readPalette = () =>
   document.documentElement.getAttribute("data-dark-palette") ??
   DEFAULT_DARK_PALETTE;
 
+/* ---------- shelf style (/books): same pattern, <html data-shelf> ---------- */
+
+function applyShelf(id: string) {
+  const root = document.documentElement;
+  if (id === DEFAULT_SHELF) root.removeAttribute("data-shelf");
+  else root.setAttribute("data-shelf", id);
+  try {
+    if (id === DEFAULT_SHELF) localStorage.removeItem(SHELF_KEY);
+    else localStorage.setItem(SHELF_KEY, id);
+  } catch {}
+  for (const l of listeners) l();
+}
+
+const readShelf = () =>
+  document.documentElement.getAttribute("data-shelf") ?? DEFAULT_SHELF;
+
 /* ---------- UI ---------- */
+
+const rowClass = (active: boolean) =>
+  `-mx-1.5 flex cursor-pointer items-center gap-2.5 rounded-md px-1.5 py-1.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
+    active ? "bg-surface text-ink" : "text-muted hover:text-ink"
+  }`;
 
 export function DebugMenu() {
   const isEnabled = useSyncExternalStore(
@@ -82,6 +107,11 @@ function DebugPanel() {
     subscribePalette,
     readPalette,
     () => DEFAULT_DARK_PALETTE,
+  );
+  const shelf = useSyncExternalStore(
+    subscribePalette,
+    readShelf,
+    () => DEFAULT_SHELF,
   );
   const { resolvedTheme, setTheme } = useTheme();
 
@@ -137,9 +167,7 @@ function DebugPanel() {
                   role="radio"
                   aria-checked={active}
                   onClick={() => choose(p.id)}
-                  className={`-mx-1.5 flex cursor-pointer items-center gap-2.5 rounded-md px-1.5 py-1.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
-                    active ? "bg-surface text-ink" : "text-muted hover:text-ink"
-                  }`}
+                  className={rowClass(active)}
                 >
                   <span
                     className="flex h-5 w-8 shrink-0 items-center justify-center gap-0.5 rounded border border-line"
@@ -157,6 +185,33 @@ function DebugPanel() {
                   </span>
                   <span className="flex-1">{p.label}</span>
                   <span className="text-xs text-muted">{p.note}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <p id="debug-shelf-label" className="mt-3 mb-1.5 text-xs text-muted">
+            Shelf <span className="font-mono">/books</span>
+          </p>
+          <div
+            role="radiogroup"
+            aria-labelledby="debug-shelf-label"
+            className="flex flex-col"
+          >
+            {SHELF_STYLES.map((st) => {
+              const active = st.id === shelf;
+              return (
+                // biome-ignore lint/a11y/useSemanticElements: matches the palette rows above
+                <button
+                  key={st.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => applyShelf(st.id)}
+                  className={rowClass(active)}
+                >
+                  <span className="flex-1">{st.label}</span>
+                  <span className="text-xs text-muted">{st.note}</span>
                 </button>
               );
             })}
