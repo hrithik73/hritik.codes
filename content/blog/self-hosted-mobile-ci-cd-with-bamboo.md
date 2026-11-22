@@ -319,7 +319,7 @@ Most of the pitch for self-hosting is cost, so here are actual numbers.
 | Install   | ~1 min  | npm install, vault decrypt                             |
 | Android   | ~6 min  | `assembleRelease` ~5.5 min, S3 uploads                 |
 | iOS       | ~13 min | prebuild + pods ~1.3 min, archive ~7 min, upload ~3.5 min |
-| Clean     | <1 min  |                                                        |
+| Clean     | &lt;1 min |                                                        |
 
 iOS and Android run in parallel, so a native build finishes in about **15 minutes** from push to TestFlight. Release builds archive iOS twice (store and ad-hoc), so they take a bit longer.
 
