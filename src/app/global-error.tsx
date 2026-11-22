@@ -1,7 +1,7 @@
 "use client";
 
-import { posthog } from "posthog-js";
 import { useEffect } from "react";
+import { captureException } from "~/lib/analytics";
 
 // Replaces the root layout when it throws, so it renders its own document and
 // gets no global styles — keep it plain.
@@ -15,7 +15,7 @@ export default function GlobalError({
   // Reporting to an external service once the error UI is shown is a genuine
   // Effect: it synchronises with something outside React.
   useEffect(() => {
-    posthog.captureException(error);
+    captureException(error);
   }, [error]);
 
   return (

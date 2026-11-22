@@ -12,8 +12,8 @@ import {
   ThermometerSun,
   Wind,
 } from "lucide-react";
-import { posthog } from "posthog-js";
 import { type CSSProperties, useSyncExternalStore } from "react";
+import { capture } from "~/lib/analytics";
 import { mulberry32 } from "~/lib/meadow";
 import { parseWeatherOverride, type Weather } from "~/lib/weather";
 
@@ -238,7 +238,7 @@ function WeatherIcon({ weather }: { weather: Weather }) {
 /** Lives in the sticky header so it's seen; clicking it goes to the meadow. */
 export function WeatherChip({ weather }: { weather: Weather }) {
   function goToMeadow() {
-    posthog.capture("weather_chip_clicked", { condition: weather.condition });
+    capture("weather_chip_clicked", { condition: weather.condition });
     const reduce = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;

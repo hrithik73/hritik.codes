@@ -2,8 +2,8 @@
 
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { posthog } from "posthog-js";
 import { useState } from "react";
+import { capture } from "~/lib/analytics";
 import { useIsClient } from "~/lib/use-is-client";
 
 const CYCLE: Record<string, string> = {
@@ -101,7 +101,7 @@ export function ThemeSwitcher() {
     playClickSound();
     setIconKey((k) => k + 1);
     setTheme(next);
-    posthog.capture("theme_preference_changed", { theme: next });
+    capture("theme_preference_changed", { theme: next });
   }
 
   const Icon = current === "dark" ? Moon : current === "light" ? Sun : Monitor;

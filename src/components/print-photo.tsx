@@ -3,6 +3,7 @@
 // next/image only ships a default export.
 import Image from "next/image";
 import { type PointerEvent, useRef, useState } from "react";
+import portrait from "../../public/avatar-portrait-hq.jpg";
 
 /* Taped-up snapshot on a memory wall. Drag it around; it floats back on release. */
 export function PrintPhoto() {
@@ -51,10 +52,13 @@ export function PrintPhoto() {
           className="absolute -top-2.5 left-1/2 h-5 w-14 -translate-x-1/2 rotate-2 bg-accent/60 shadow-sm"
         />
         <Image
-          src="/avatar-portrait-hq.jpg"
+          src={portrait}
           alt="Hritik Singh"
-          width={200}
-          height={250}
+          // Rendered at most 144×192 CSS px; sizing to that keeps the 2x
+          // variant at 384w instead of 640w.
+          width={144}
+          height={192}
+          placeholder="blur"
           preload
           draggable={false}
           className="h-36 w-28 object-cover sm:h-48 sm:w-36"

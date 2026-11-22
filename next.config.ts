@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   experimental: {
     agentUpgrade: "security",
+    // Tailwind output is small (~10 KB gz): ship it in the HTML instead of a
+    // render-blocking stylesheet request.
+    inlineCss: true,
   },
   // PostHog API paths rely on trailing slashes (e.g. /e/, /flags/).
   skipTrailingSlashRedirect: true,

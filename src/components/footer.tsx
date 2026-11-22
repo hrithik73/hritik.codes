@@ -1,9 +1,9 @@
 "use client";
 
 import { Github, Linkedin, Mail } from "lucide-react";
-import { posthog } from "posthog-js";
 import type { ReactNode } from "react";
 import { socialLinks } from "~/config/site";
+import { capture } from "~/lib/analytics";
 import { FooterClock } from "./footer-clock";
 import { Meadow } from "./meadow";
 import { useWeather, WeatherFx, weatherAttributes } from "./weather";
@@ -72,13 +72,13 @@ export function Footer() {
                 rel={isEmailContact ? undefined : "me noopener noreferrer"}
                 onClick={() => {
                   if (isEmailContact) {
-                    posthog.capture("contact_link_clicked", {
+                    capture("contact_link_clicked", {
                       contact_method: "email",
                     });
                     return;
                   }
 
-                  posthog.capture("social_profile_clicked");
+                  capture("social_profile_clicked");
                 }}
                 className="group inline-flex items-center gap-1.5 underline decoration-transparent decoration-1 underline-offset-[5px] hover:text-ink hover:decoration-line transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded"
               >
