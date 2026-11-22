@@ -5,7 +5,9 @@ const host = process.env.NEXT_PUBLIC_POSTHOG_HOST;
 
 if (token && host) {
   posthog.init(token, {
-    api_host: host,
+    // Routed through the /ingest rewrite in next.config.ts to avoid ad blockers.
+    api_host: "/ingest",
+    ui_host: host.replace(/\.i\.posthog\.com$/, ".posthog.com"),
     defaults: "2026-08-30",
     capture_exceptions: true,
     debug: process.env.NODE_ENV === "development",
