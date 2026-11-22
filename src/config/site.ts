@@ -6,3 +6,6 @@ export const socialLinks = [
   { name: "github", href: "https://github.com/hrithik73" },
   { name: "linkedin", href: "https://www.linkedin.com/in/hrithik73/" },
 ];
+
+// Where I live: the header weather and footer meadow follow its sky.
+export const home = { city: "Delhi", latitude: 28.61, longitude: 77.21 };

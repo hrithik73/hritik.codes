@@ -2,7 +2,7 @@ const TILE_W = 420;
 const TILE_H = 100;
 
 // Seeded so every build renders the same meadow.
-function mulberry32(seed: number) {
+export function mulberry32(seed: number) {
   let a = seed;
   return () => {
     a |= 0;
@@ -118,4 +118,17 @@ export const meadowLayers: Record<string, string> = {
   ),
   mid: tile(blades(midGrass) + clovers.map(clover).join("")),
   front: tile(flowers.map(flower).join("") + blades(frontGrass)),
+  // Only shown when it's snowing (see the weather block in globals.css).
+  snow: tile(snowbank(5, "#dbe4ee") + snowbank(0, "#f7f9fc")),
 };
+
+// A soft drift across the tile. Whole-number frequencies keep it seamless.
+function snowbank(drop: number, fill: string) {
+  const points = Array.from({ length: 43 }, (_, i) => {
+    const x = (i / 42) * TILE_W;
+    const t = (x / TILE_W) * Math.PI * 2;
+    const y = 84 + drop - 4 * Math.sin(t * 3) - 2.5 * Math.sin(t * 7 + 1);
+    return `${r1(x)} ${r1(y)}`;
+  });
+  return `<path d="M0 ${TILE_H}L${points.join("L")}L${TILE_W} ${TILE_H}Z" fill="${fill}"/>`;
+}

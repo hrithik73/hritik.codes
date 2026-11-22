@@ -177,6 +177,300 @@ h3 {
   animation-duration: 2.6s;
 }
 
+/*
+ * Weather: the footer gets data-weather / data-windy / data-hot / data-day
+ * from the visitor's local conditions (src/components/weather.tsx).
+ * Preview any state with ?weather=snow, ?weather=rain,windy, ?weather=hot …
+ */
+.meadow-layer-snow {
+  display: none;
+  background-image: url(/meadow/snow);
+  animation: none;
+  scale: 1;
+}
+
+.meadow-ground {
+  transition: filter 1.2s ease-out;
+}
+
+/* Wind: the breeze becomes a gust */
+.site-footer[data-windy] .meadow-layer {
+  --sway: 2.4deg;
+  animation-duration: 1.7s;
+}
+.site-footer[data-windy] .meadow-layer-mid {
+  --sway: 3.2deg;
+}
+.site-footer[data-windy] .meadow-layer-front {
+  --sway: 4.2deg;
+  animation-duration: 1.3s;
+}
+
+/* Heat: grass droops and dries out, the air shimmers */
+.site-footer[data-hot] .meadow-layer {
+  scale: 1 0.8;
+  animation-duration: 4.5s;
+}
+.site-footer[data-hot] .meadow-ground {
+  filter: url(#wx-heat) sepia(0.3) saturate(0.85);
+}
+
+/* Wet, frosty, gloomy */
+.site-footer[data-weather="cloudy"] .meadow-ground {
+  filter: saturate(0.8) brightness(0.94);
+}
+.site-footer[data-weather="fog"] .meadow-ground {
+  filter: saturate(0.6) contrast(0.8);
+  opacity: 0.8;
+}
+.site-footer[data-weather="drizzle"] .meadow-ground,
+.site-footer[data-weather="rain"] .meadow-ground {
+  filter: brightness(0.9) saturate(1.1);
+}
+.site-footer[data-weather="storm"] .meadow-ground {
+  filter: brightness(0.78) saturate(0.85);
+  animation: wx-ground-flash 9s linear infinite;
+}
+.site-footer[data-weather="snow"] .meadow-ground {
+  filter: saturate(0.45) brightness(1.08);
+}
+.site-footer[data-weather="snow"] .meadow-layer-snow {
+  display: block;
+}
+.dark .meadow-layer-snow {
+  filter: brightness(0.78) saturate(0.7);
+}
+
+/* The sky layer: sits over the meadow, under the footer links, and reaches a
+   little way up the page so rain falls out of nothing */
+.wx {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 170px;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent, #000 45%);
+  animation: fadeIn 1.2s ease-out both;
+}
+
+.wx-chip {
+  animation: fadeIn 0.6s ease-out both;
+}
+
+.wx > * {
+  position: absolute;
+}
+
+.wx-drop {
+  top: 0;
+  width: 1px;
+  border-radius: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in oklch, var(--ink) 50%, transparent)
+  );
+  rotate: calc(var(--tilt) * -1);
+  animation: wx-fall linear infinite;
+}
+
+.wx-flake {
+  top: 0;
+  border-radius: 9999px;
+  background: oklch(0.99 0.005 245);
+  box-shadow: 0 0 0 0.5px oklch(0.6 0.03 245 / 0.35);
+  animation: wx-snow linear infinite;
+}
+
+.dark .wx-flake {
+  background: oklch(0.92 0.01 245);
+  box-shadow: 0 0 4px oklch(0.92 0.01 245 / 0.4);
+}
+
+.wx-leaf {
+  left: 0;
+  width: 7px;
+  height: 4px;
+  border-radius: 9999px 0;
+  background: oklch(0.62 0.13 var(--hue));
+  animation: wx-blow linear infinite;
+}
+
+.wx-fog {
+  height: 28px;
+  width: 70%;
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--bg) 80%, transparent);
+  filter: blur(10px);
+  animation: wx-fog-drift 26s ease-in-out infinite alternate;
+}
+.dark .wx-fog {
+  background: color-mix(in oklch, var(--ink) 22%, transparent);
+}
+.wx-fog-0 {
+  bottom: 8px;
+  left: -10%;
+}
+.wx-fog-1 {
+  bottom: 34px;
+  left: 30%;
+  animation-duration: 34s;
+  animation-direction: alternate-reverse;
+}
+.wx-fog-2 {
+  bottom: 58px;
+  left: 5%;
+  width: 50%;
+  opacity: 0.7;
+  animation-duration: 41s;
+}
+
+/* A cloud's shadow sliding across the grass */
+.wx-shade {
+  bottom: 0;
+  left: 0;
+  width: 45%;
+  height: 52px;
+  background: radial-gradient(
+    ellipse at center,
+    oklch(0.2 0.02 245 / 0.18),
+    transparent 70%
+  );
+  animation: wx-shade-pass 28s linear infinite;
+}
+
+.wx-flash {
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 65% 0%,
+    oklch(1 0 0 / 0.55),
+    transparent 70%
+  );
+  opacity: 0;
+  animation: wx-flash 9s linear infinite;
+}
+
+.wx-sun {
+  right: -60px;
+  bottom: -40px;
+  width: 340px;
+  height: 200px;
+  background: radial-gradient(
+    ellipse at center,
+    oklch(0.86 0.13 75 / 0.32),
+    transparent 65%
+  );
+  animation: wx-glow 6s ease-in-out infinite alternate;
+}
+
+.site-footer:not([data-day]) .wx-sun {
+  opacity: 0.4;
+}
+
+@keyframes wx-fall {
+  from {
+    translate: 0 -24px;
+  }
+  to {
+    translate: var(--drift) var(--fall);
+  }
+}
+
+@keyframes wx-snow {
+  0% {
+    translate: 0 -10px;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  35% {
+    translate: calc(var(--drift) * 0.35 + 7px) calc(var(--fall) * 0.35);
+  }
+  70% {
+    translate: calc(var(--drift) * 0.7 - 5px) calc(var(--fall) * 0.7);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    translate: var(--drift) var(--fall);
+    opacity: 0;
+  }
+}
+
+@keyframes wx-blow {
+  from {
+    translate: -20px 0;
+    rotate: 0deg;
+  }
+  50% {
+    translate: 50vw -18px;
+  }
+  to {
+    translate: 105vw 6px;
+    rotate: 720deg;
+  }
+}
+
+@keyframes wx-fog-drift {
+  to {
+    translate: 18% 0;
+  }
+}
+
+@keyframes wx-shade-pass {
+  from {
+    translate: -100% 0;
+  }
+  to {
+    translate: 260% 0;
+  }
+}
+
+@keyframes wx-flash {
+  0%,
+  92%,
+  100% {
+    opacity: 0;
+  }
+  93% {
+    opacity: 0.8;
+  }
+  94% {
+    opacity: 0.1;
+  }
+  95.5% {
+    opacity: 1;
+  }
+  98% {
+    opacity: 0;
+  }
+}
+
+@keyframes wx-ground-flash {
+  0%,
+  92%,
+  94%,
+  98%,
+  100% {
+    filter: brightness(0.78) saturate(0.85);
+  }
+  93%,
+  95.5% {
+    filter: brightness(1.5) saturate(0.7);
+  }
+}
+
+@keyframes wx-glow {
+  to {
+    opacity: 0.6;
+    scale: 1.08;
+  }
+}
+
 @media (hover: hover) {
   .site-footer:hover .meadow-layer {
     --sway: 3deg;
@@ -247,6 +541,17 @@ h3 {
   display: block;
 }
 
+/* No fireflies out in the rain */
+.site-footer:is(
+  [data-weather="drizzle"],
+  [data-weather="rain"],
+  [data-weather="storm"],
+  [data-weather="snow"]
+)
+.firefly {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,
@@ -256,6 +561,15 @@ h3 {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     transition-delay: 0s !important;
+  }
+
+  /* Weather keeps its stills (snowbank, wet/dry tint) but drops the motion */
+  .wx-drop,
+  .wx-flake,
+  .wx-leaf,
+  .wx-shade,
+  .wx-flash {
+    display: none;
   }
 }
 

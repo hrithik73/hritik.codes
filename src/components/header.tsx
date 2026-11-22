@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeSwitcher } from "./theme-switcher";
+import { useWeather, WeatherChip } from "./weather";
 
 const nav = [
   { label: "work", href: "/projects" },
@@ -15,6 +16,7 @@ export function Header() {
   const pathname = usePathname();
   // The home hero already says the name — don't say it twice
   const home = pathname === "/";
+  const weather = useWeather();
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur-sm">
@@ -29,6 +31,9 @@ export function Header() {
           </Link>
         )}
         <nav className="ml-auto flex items-center gap-5">
+          {/* First child of a right-aligned row: it grows leftward when it
+              arrives, so the links don't shift */}
+          {weather && <WeatherChip weather={weather} />}
           {nav.map((item) => {
             const active = pathname.startsWith(item.href);
             return (

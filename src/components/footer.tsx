@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { socialLinks } from "~/config/site";
 import { FooterClock } from "./footer-clock";
 import { Meadow } from "./meadow";
+import { useWeather, WeatherFx, weatherAttributes } from "./weather";
 
 function XIcon() {
   return (
@@ -47,8 +48,14 @@ const footerLinks = [
 ];
 
 export function Footer() {
+  const weather = useWeather();
+
   return (
-    <footer className="site-footer mt-2">
+    <footer
+      className="site-footer relative mt-2"
+      {...weatherAttributes(weather)}
+    >
+      {weather && <WeatherFx weather={weather} />}
       <div className="relative z-10 mx-auto max-w-2xl px-6 flex items-center justify-between gap-6">
         <nav
           aria-label="Social links"

@@ -25,16 +25,18 @@ export const mdxComponents: MDXComponents = {
     </a>
   ),
   ul: ({ children }) => (
-    <ul className="list-disc list-inside mb-4 text-ink/90 space-y-2">
+    <ul className="list-disc pl-6 mb-4 marker:text-muted text-ink/90 space-y-2">
       {children}
     </ul>
   ),
   ol: ({ children }) => (
-    <ol className="list-decimal list-inside mb-4 text-ink/90 space-y-2">
+    <ol className="list-decimal pl-6 mb-4 marker:text-muted text-ink/90 space-y-2">
       {children}
     </ol>
   ),
-  li: ({ children }) => <li className="ml-4 leading-[1.75]">{children}</li>,
+  li: ({ children }) => (
+    <li className="pl-1 leading-[1.75] [&>p]:mb-2">{children}</li>
+  ),
   code: ({ children, className, ...props }) => {
     const isInlineCode = !className;
 
