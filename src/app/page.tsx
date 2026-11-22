@@ -66,7 +66,16 @@ export default function Home() {
 
             <p className="mt-6 text-lg sm:text-xl text-muted leading-[1.6] text-pretty">
               I’m a product-minded mobile engineer, currently making poker games
-              at <strong className="font-medium text-ink">Baazi Games</strong>.
+              at{" "}
+              <a
+                href="https://www.linkedin.com/company/baazi-games/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-ink underline decoration-accent/40 decoration-1 underline-offset-4 hover:decoration-accent transition-colors"
+              >
+                Baazi Games
+              </a>{" "}
+              (the company behind PokerBaazi).
             </p>
           </div>
 
