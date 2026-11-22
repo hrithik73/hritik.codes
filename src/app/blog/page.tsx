@@ -26,7 +26,7 @@ export default async function BlogPage() {
   const viewCounts = await getViewCounts(posts.map((p) => p.slug));
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-14 anim-page">
+    <div className="page-col mx-auto max-w-[55rem] px-6 py-14 anim-page">
       <header className="mb-10">
         <h1 className="font-display text-3xl text-ink">Writing</h1>
       </header>

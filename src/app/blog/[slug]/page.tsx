@@ -77,7 +77,7 @@ export default async function BlogPost({ params }: Props) {
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-14 anim-page">
+    <div className="page-col mx-auto max-w-[55rem] px-6 py-14 anim-page">
       <script
         type="application/ld+json"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD from our own frontmatter

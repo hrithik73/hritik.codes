@@ -49,7 +49,7 @@ export default function Home() {
   const posts = getPosts().slice(0, 3);
 
   return (
-    <div className="mx-auto max-w-2xl px-6 pt-12 pb-16">
+    <div className="page-col mx-auto max-w-[55rem] px-6 pt-12 pb-16">
       <script
         type="application/ld+json"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD, no user input
@@ -158,21 +158,23 @@ export default function Home() {
                 href={`/blog/${post.slug}`}
                 className="group flex items-center justify-between py-3 -mx-3 px-3 rounded-lg hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
               >
-                <span className="text-ink text-[15px]">{post.title}</span>
-                <div className="flex items-center gap-3 shrink-0 ml-4">
-                  {post.date && (
-                    <span className="text-sm text-muted tabular-nums">
-                      {formatPostDate(post.date, {
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
-                  )}
+                {/* Arrow rides after the title so dates sit flush right,
+                    lined up with the Work dates above */}
+                <span className="flex items-center gap-1.5 min-w-0 text-ink text-[15px]">
+                  {post.title}
                   <ArrowUpRight
-                    className="w-4 h-4 text-accent opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"
+                    className="w-4 h-4 shrink-0 text-accent opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"
                     aria-hidden="true"
                   />
-                </div>
+                </span>
+                {post.date && (
+                  <span className="text-sm text-muted tabular-nums shrink-0 ml-4">
+                    {formatPostDate(post.date, {
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
+                )}
               </Link>
             ))
           ) : (

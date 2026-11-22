@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function ProjectsPage() {
   return (
-    <div className="mx-auto max-w-2xl px-6 py-14 anim-page">
+    <div className="page-col mx-auto max-w-[55rem] px-6 py-14 anim-page">
       {/* Header */}
       <div className="mb-12">
         <h1 className="font-display text-3xl text-ink mb-2">Work</h1>

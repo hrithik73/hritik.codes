@@ -9,8 +9,18 @@ import {
   DEBUG_ENABLED_KEY,
   DEFAULT_DARK_PALETTE,
   DEFAULT_SHELF,
+  DEFAULT_ZOOM,
+  PAGE_WIDTH_BASE,
+  PAGE_WIDTH_KEY,
+  PAGE_WIDTH_MAX,
+  PAGE_WIDTH_MIN,
+  PAGE_WIDTH_STEP,
   SHELF_KEY,
   SHELF_STYLES,
+  ZOOM_KEY,
+  ZOOM_MAX,
+  ZOOM_MIN,
+  ZOOM_STEP,
 } from "~/lib/debug";
 
 /*
@@ -32,6 +42,8 @@ function readEnabled() {
       localStorage.removeItem(DEBUG_ENABLED_KEY);
       applyPalette(DEFAULT_DARK_PALETTE);
       applyShelf(DEFAULT_SHELF);
+      applyZoom(DEFAULT_ZOOM);
+      applyPageWidth(null);
     } else if (param !== null) {
       localStorage.setItem(DEBUG_ENABLED_KEY, "1");
     }
@@ -84,6 +96,49 @@ function applyShelf(id: string) {
 const readShelf = () =>
   document.documentElement.getAttribute("data-shelf") ?? DEFAULT_SHELF;
 
+/* ---------- zoom: inline style.zoom on <html> ---------- */
+
+function applyZoom(z: number) {
+  const root = document.documentElement;
+  if (z === DEFAULT_ZOOM) root.style.removeProperty("zoom");
+  else root.style.zoom = String(z);
+  try {
+    if (z === DEFAULT_ZOOM) localStorage.removeItem(ZOOM_KEY);
+    else localStorage.setItem(ZOOM_KEY, String(z));
+  } catch {}
+  for (const l of listeners) l();
+}
+
+const readZoom = () =>
+  Number.parseFloat(document.documentElement.style.zoom) || DEFAULT_ZOOM;
+
+/* ---------- content width: <html data-page-width> + --debug-page-width ---------- */
+
+/** rem, or null for each page's own width */
+function applyPageWidth(rem: number | null) {
+  const root = document.documentElement;
+  if (rem === null) {
+    root.removeAttribute("data-page-width");
+    root.style.removeProperty("--debug-page-width");
+  } else {
+    root.setAttribute("data-page-width", "");
+    root.style.setProperty("--debug-page-width", `${rem}rem`);
+  }
+  try {
+    if (rem === null) localStorage.removeItem(PAGE_WIDTH_KEY);
+    else localStorage.setItem(PAGE_WIDTH_KEY, String(rem));
+  } catch {}
+  for (const l of listeners) l();
+}
+
+const readPageWidth = () => {
+  const root = document.documentElement;
+  if (!root.hasAttribute("data-page-width")) return null;
+  return (
+    Number.parseFloat(root.style.getPropertyValue("--debug-page-width")) || null
+  );
+};
+
 /* ---------- UI ---------- */
 
 const rowClass = (active: boolean) =>
@@ -112,6 +167,16 @@ function DebugPanel() {
     subscribePalette,
     readShelf,
     () => DEFAULT_SHELF,
+  );
+  const zoom = useSyncExternalStore(
+    subscribePalette,
+    readZoom,
+    () => DEFAULT_ZOOM,
+  );
+  const pageWidth = useSyncExternalStore(
+    subscribePalette,
+    readPageWidth,
+    () => null,
   );
   const { resolvedTheme, setTheme } = useTheme();
 
@@ -148,6 +213,62 @@ function DebugPanel() {
               <X className="size-3.5" aria-hidden="true" />
             </button>
           </div>
+
+          <div className="mb-1.5 flex items-center justify-between text-xs text-muted">
+            <label htmlFor="debug-zoom">Zoom</label>
+            <span className="flex items-center gap-2">
+              <span className="font-mono tabular-nums text-ink">
+                {Math.round(zoom * 1000) / 10}%
+              </span>
+              {zoom !== DEFAULT_ZOOM && (
+                <button
+                  type="button"
+                  onClick={() => applyZoom(DEFAULT_ZOOM)}
+                  className="cursor-pointer rounded underline underline-offset-2 transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                >
+                  reset
+                </button>
+              )}
+            </span>
+          </div>
+          <input
+            id="debug-zoom"
+            type="range"
+            min={ZOOM_MIN}
+            max={ZOOM_MAX}
+            step={ZOOM_STEP}
+            value={zoom}
+            onChange={(e) => applyZoom(Number(e.currentTarget.value))}
+            className="mb-3 w-full cursor-pointer accent-[var(--accent)]"
+          />
+
+          <div className="mb-1.5 flex items-center justify-between text-xs text-muted">
+            <label htmlFor="debug-width">Content width</label>
+            <span className="flex items-center gap-2">
+              <span className="font-mono tabular-nums text-ink">
+                {pageWidth === null ? "per page" : `${pageWidth}rem`}
+              </span>
+              {pageWidth !== null && (
+                <button
+                  type="button"
+                  onClick={() => applyPageWidth(null)}
+                  className="cursor-pointer rounded underline underline-offset-2 transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                >
+                  reset
+                </button>
+              )}
+            </span>
+          </div>
+          <input
+            id="debug-width"
+            type="range"
+            min={PAGE_WIDTH_MIN}
+            max={PAGE_WIDTH_MAX}
+            step={PAGE_WIDTH_STEP}
+            value={pageWidth ?? PAGE_WIDTH_BASE}
+            onChange={(e) => applyPageWidth(Number(e.currentTarget.value))}
+            className="mb-3 w-full cursor-pointer accent-[var(--accent)]"
+          />
 
           <p id="debug-palette-label" className="mb-1.5 text-xs text-muted">
             Dark palette
