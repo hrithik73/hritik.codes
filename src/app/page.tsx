@@ -64,7 +64,7 @@ export default function Home() {
             </h1>
             <Squiggle />
 
-            <p className="mt-6 text-lg sm:text-xl text-muted leading-[1.6] text-pretty">
+            <p className="mt-6 text-base sm:text-lg text-muted leading-[1.6] text-pretty">
               I’m a product-minded mobile engineer, currently making poker games
               at{" "}
               <a

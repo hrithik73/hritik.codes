@@ -2,10 +2,12 @@ import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
+import { DebugMenu } from "~/components/debug-menu";
 import { Footer } from "~/components/footer";
 import { Header } from "~/components/header";
 import { ThemeProvider } from "~/components/theme-provider";
 import { siteUrl } from "~/config/site";
+import { darkPaletteScript } from "~/lib/debug";
 import "./globals.css";
 
 const geist = Geist({
@@ -42,7 +44,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#fcfcfc" },
-    { media: "(prefers-color-scheme: dark)", color: "#1c1c1c" },
+    { media: "(prefers-color-scheme: dark)", color: "#080c10" },
   ],
 };
 
@@ -53,6 +55,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Static string from our own config: applies a previewed dark palette before paint */}
+        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: trusted constant */}
+        <script dangerouslySetInnerHTML={{ __html: darkPaletteScript }} />
+      </head>
       <body
         className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
       >
@@ -70,6 +77,7 @@ export default function RootLayout({
             </main>
             <Footer />
           </div>
+          <DebugMenu />
         </ThemeProvider>
         <Analytics />
       </body>

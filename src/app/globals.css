@@ -16,7 +16,36 @@
   --line: oklch(0.88 0 0);
 }
 
+/* Midnight: near-black with a whisper of blue, apricot accent */
 .dark {
+  --bg: oklch(0.15 0.012 250);
+  --surface: oklch(0.2 0.015 250);
+  --ink: oklch(0.9 0.015 245);
+  --muted: oklch(0.7 0.025 245);
+  --primary: oklch(0.9 0.015 245);
+  --accent: oklch(0.76 0.13 65);
+  --line: oklch(0.29 0.015 250);
+}
+
+/*
+ * Alternate dark palettes, previewed from the debug menu
+ * (src/components/debug-menu.tsx). Each one overrides the `.dark` tokens
+ * when <html> carries the matching data-dark-palette; no attribute = Midnight.
+ */
+
+/* Warm paper: sunilpai.dev's dark theme (hex kept as-is from the source) */
+.dark[data-dark-palette="warm"] {
+  --bg: #1c1d1c;
+  --surface: #262724;
+  --ink: #d5d1c8;
+  --muted: #96928a;
+  --primary: #d5d1c8;
+  --accent: #8fb4d8;
+  --line: #494741;
+}
+
+/* Neutral: pure grey near-black, lime accent (the previous default) */
+.dark[data-dark-palette="neutral"] {
   --bg: oklch(0.16 0 0);
   --surface: oklch(0.21 0 0);
   --ink: oklch(0.94 0 0);
@@ -24,6 +53,17 @@
   --primary: oklch(0.94 0 0);
   --accent: oklch(0.87 0.19 128);
   --line: oklch(0.3 0 0);
+}
+
+/* OLED: true black */
+.dark[data-dark-palette="oled"] {
+  --bg: oklch(0 0 0);
+  --surface: oklch(0.17 0 0);
+  --ink: oklch(0.93 0 0);
+  --muted: oklch(0.68 0 0);
+  --primary: oklch(0.93 0 0);
+  --accent: oklch(0.87 0.19 128);
+  --line: oklch(0.26 0 0);
 }
 
 @theme inline {
