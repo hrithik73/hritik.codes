@@ -39,7 +39,7 @@ export function PrintPhoto() {
       onPointerCancel={end}
       data-dragging={dragging || undefined}
       style={{ translate: `${offset.x}px ${offset.y}px` }}
-      className={`group relative z-10 shrink-0 self-start p-3 -m-3 select-none sm:touch-none ${
+      className={`group relative z-10 shrink-0 self-start sm:self-center p-3 -m-3 select-none sm:touch-none ${
         dragging
           ? "cursor-grabbing"
           : "cursor-grab motion-safe:transition-[translate] motion-safe:duration-700 motion-safe:ease-[cubic-bezier(0.25,0.8,0.25,1)]"

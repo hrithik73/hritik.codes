@@ -57,22 +57,16 @@ export default function Home() {
       />
       {/* Hero */}
       <section className="mb-14 anim-1">
-        <div className="flex flex-col-reverse gap-8 sm:flex-row sm:items-start sm:justify-between sm:gap-10">
-          <div className="min-w-0 max-w-[65ch]">
-            <h1 className="font-display text-[clamp(2rem,8vw,2.75rem)] leading-[1.1] text-ink">
-              Hritik Singh
+        <div className="flex flex-col-reverse gap-8 sm:flex-row sm:items-center sm:justify-between sm:gap-10">
+          <div className="min-w-0">
+            <h1 className="font-display text-[clamp(2.25rem,9vw,3rem)] leading-[1.05] tracking-tight text-ink">
+              Hi, I’m Hritik.
             </h1>
             <Squiggle />
 
-            <p className="mt-6 text-base text-muted leading-[1.75] text-pretty">
-              Hey <span aria-hidden="true">👋</span>, I am Hritik, an
-              output-oriented developer with a product mindset. 5+ years of
-              building good products used by thousands to millions of people,
-              currently at{" "}
-              <strong className="font-medium text-ink">BaaziGames</strong>.
-              Previously at{" "}
-              <strong className="font-medium text-ink">BharatPe</strong> and{" "}
-              <strong className="font-medium text-ink">CARS24</strong>.
+            <p className="mt-6 text-lg sm:text-xl text-muted leading-[1.6] text-pretty">
+              I’m a product-minded mobile engineer, currently making poker games
+              at <strong className="font-medium text-ink">Baazi Games</strong>.
             </p>
           </div>
 
