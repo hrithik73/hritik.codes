@@ -51,7 +51,7 @@ export function PrintPhoto() {
           className="absolute -top-2.5 left-1/2 h-5 w-14 -translate-x-1/2 rotate-2 bg-accent/60 shadow-sm"
         />
         <Image
-          src="/avatar-portrait.jpg"
+          src="/avatar-portrait-hq.jpg"
           alt="Hritik Singh"
           width={200}
           height={250}
