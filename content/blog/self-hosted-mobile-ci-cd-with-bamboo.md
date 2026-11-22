@@ -1,89 +1,81 @@
 ---
 title: Building our own mobile CI/CD on a Mac with Bamboo
 date: 2026/11/22
-description: How we ship a React Native (Expo) app to TestFlight, S3 and OTA updates from a self-hosted Mac running Bamboo, with fastlane in a separate tools repo, an encrypted secrets vault, and a version string that decides what gets built.
+description: How we ship our React Native app to testers and the app stores from one Mac in the office. How the pieces fit together, where the secrets live, and what it really costs compared with hosted CI.
 tag: react-native,expo,ci-cd,fastlane,bamboo,devops
 author: Hritik Singh
 ---
 
-Most mobile CI guides start with "sign up for a hosted CI". That's a good default, but it isn't always an option. Our company already ran Atlassian Bamboo, iOS builds need macOS, and hosted macOS minutes get expensive once you're shipping a few builds a day for two platforms.
+Most guides to mobile CI start with "sign up for a hosted service". That's usually good advice, but it wasn't an option for us. The company already ran Atlassian Bamboo, iOS apps can only be built on a Mac, and paying for hosted Mac time adds up quickly when you ship a few builds a day for both iOS and Android.
 
-So we built our own: one Mac in the office running a Bamboo agent, a separate repo of fastlane lanes and shell scripts, and an encrypted vault for every key and certificate. A developer runs one command on their laptop, and a few minutes later Slack says the build is on TestFlight.
+So we built our own. One Mac in the office does all the builds. A separate git repo holds the build scripts, and every password, key and certificate sits in an encrypted store. When developers want a build, they run one command on their laptop. About 15 minutes later, a Slack message says the build is on TestFlight.
 
-This post walks through how it fits together. All names, URLs and IDs below are placeholders, but the structure is what we actually run.
+This post covers how it fits together, what tripped us up along the way, and whether it actually saves money. The names, URLs and IDs are placeholders, but the setup is the one we really run.
 
 ## The big picture
 
+Here's what happens between typing the command and getting the Slack message:
+
 ```
- developer laptop                    Bamboo server              Mac build agent
- ────────────────                    ─────────────              ───────────────
- npm run deploy                                                  
-   ├─ pick version + changelog                                   
-   ├─ commit "BUILD: 2.3.0+staging"                              
-   └─ git push  ───────────────────►  plan branch detects  ────► Install job
-                                      the commit                  ├─ clone app + tools
-                                                                  ├─ pull encrypted vault
-                                                                  ├─ npm ci, expo prebuild
-                                                                  ▼
-                                                                Deploy stage (parallel)
-                                                                  ├─ iOS  → fastlane ios deploy
-                                                                  └─ Android → fastlane android deploy
-                                                                  ▼
-                                                                Clean job
-                                                                  └─ delete checkouts
-                                                                  ▼
-                                                                Slack: "build ready"
+ Your laptop                    Bamboo                    The Mac
+ ───────────                    ──────                    ───────
+ npm run deploy
+   ├─ choose a version
+   ├─ write a changelog
+   └─ push a "BUILD:" commit ──► notices the commit ────► 1. Install
+                                                             get the code and secrets,
+                                                             install dependencies
+                                                          2. Build iOS and Android
+                                                             at the same time
+                                                          3. Clean up
+                                                          4. Post to Slack
 ```
 
-There are three pieces:
+The system has three parts:
 
-1. **The app repo.** The React Native app, plus a small `deploy` script that bumps the version and pushes a build commit.
-2. **The tools repo.** fastlane lanes, the Bamboo entry-point scripts, and shared non-secret config. No app code.
-3. **The vault.** An encrypted branch holding every `.env` file, API key and signing certificate.
+1. **The app repo** holds the React Native app and a small script that starts a build.
+2. **The tools repo** holds the build scripts. That means our fastlane setup (fastlane is a popular tool for automating iOS and Android builds and uploads) and the shell scripts Bamboo runs. There's no app code in it.
+3. **The vault** is an encrypted git branch that holds every secret: settings files, API keys and signing certificates.
 
-Bamboo itself does very little. Every job is a single "Script" task that sources a shell file from the tools repo and calls one function. All the logic lives in git, where it can be reviewed and rolled back like any other code.
+Bamboo itself does very little. Each step in Bamboo just runs one function from the tools repo. All the real logic lives in git, so changes to the build go through code review and can be rolled back like any other change.
 
-## Why a separate tools repo?
+## Why the build scripts have their own repo
 
-Our first version kept fastlane inside the app repo. Over time that caused two problems:
+At first, the build scripts lived inside the app repo. That caused two problems.
 
-- **CI changes were tied to app branches.** Fixing a broken upload step meant merging into whatever feature branch someone was trying to build.
-- **Secrets drifted too close to the app.** Lanes need credentials, and having `secrets/` folders and fastlane config in the same tree as app code made it far too easy to commit something you shouldn't.
+The first was that fixing the build was tied to app branches. If the upload step broke, the fix had to be merged into whichever feature branch someone was trying to build at the time.
 
-Now the Bamboo plan has two linked repositories: the app repo (on whatever branch triggered the build) and the tools repo (usually `main`). The tools repo finds the app through one environment variable:
+The second was that secrets sat too close to the app code. The build needs credentials, and with secret folders in the same project as the app, it was far too easy to commit something by accident.
 
-```ruby
-# fastlane/fastfile.rb
-@root_path = Pathname.new(
-  ENV['FASTLANE_ROOT_PATH'] || File.expand_path('../../../my-mobile-app', __FILE__)
-)
-@keys_path = Pathname.new(File.expand_path('../../secrets', __FILE__))
-```
-
-On a laptop the two repos sit side by side and the default path just works. On CI, the scripts clone the app into `<working-dir>/mobile` and set `FASTLANE_ROOT_PATH` to that path.
+Now Bamboo checks out two repos for every build: the app, on whichever branch started the build, and the tools repo, usually on `main`. The tools repo only needs to know where the app is. On a laptop the two repos sit next to each other, so it finds the app without any help. On the build machine, the scripts set one environment variable that points to the app's folder.
 
 ## The build machine
 
-The agent is a Mac with:
+The Mac has very little installed on it:
 
-- Xcode, plus the command line tools
-- Homebrew: Node, Ruby (pinned with `.ruby-version`), OpenJDK 17, `ccache`, `awscli`
-- `eas-cli` for OTA updates
-- the Bamboo remote agent, running as a normal user with an auto-login session (so the keychain can be unlocked)
+- Xcode and its command line tools
+- Node, Ruby, Java 17, ccache (a compiler cache, more on that later) and the AWS command line tool, all installed with Homebrew
+- Expo's command line tool, for over-the-air updates
+- the Bamboo agent, which is the program that picks up jobs from the Bamboo server. It runs as a normal user that logs in automatically, so the Mac's keychain can be unlocked for code signing.
 
-That's all. Nothing project-specific is installed on the machine by hand, so if it dies we can rebuild it from a short checklist.
+Nothing about our project is set up on the machine by hand. If the Mac dies, we can set up a new one from a short checklist.
 
-## The version string decides what gets built
+## The version number decides what gets built
 
-This is the part I like most. Nobody picks "staging" or "release" in a Bamboo dropdown. The `version` in the app's `package.json` carries that information as semver build metadata:
+This is my favourite part of the setup. Nobody picks "staging" or "release" from a menu in Bamboo. Instead, the version number in the app's `package.json` carries that information after a `+` sign:
 
 ```
-2.3.0+staging          → staging build, OTA update only
-2.3.0+staging.hard     → staging build, full native build
-2.3.0+release.hard     → production, native build + store upload
+2.3.0+staging          → staging, over-the-air update only
+2.3.0+staging.hard     → staging, full native build
+2.3.0+release.hard     → production, native build and store upload
 ```
 
-A `before_all` hook in fastlane parses the version and sets the mode for everything that runs after it:
+It helps to know the two kinds of build:
+
+- A **soft** build is an over-the-air (OTA) update. It sends new JavaScript to apps people already have installed, without going through the App Store or Play Store. It's quick and cheap.
+- A **hard** build is a full native build. It produces a new app file (an IPA for iOS, an APK or AAB for Android) that people have to install or download from the store. You need one whenever native code changes.
+
+Before anything else runs, fastlane reads the version, works out the mode (testing, staging or release) and whether it's a hard or soft build, and loads the right settings for that mode. This is the part that reads the version:
 
 ```ruby
 def load_version
@@ -91,188 +83,120 @@ def load_version
   flags   = version.split('+')[1].to_s.split('.')
 
   ENV['MODE'] = flags.find { |f| f.match?(/^(testing|staging|release)$/) }
-
-  if flags.include?('hard')
-    ENV['IPA_DEPLOYMENT'] = ENV['APK_DEPLOYMENT'] = 'hard'  # native build
-  else
-    ENV['IPA_DEPLOYMENT'] = ENV['APK_DEPLOYMENT'] = 'soft'  # OTA only
-  end
+  ENV['IPA_DEPLOYMENT'] = ENV['APK_DEPLOYMENT'] = flags.include?('hard') ? 'hard' : 'soft'
 end
 ```
 
-Then it loads config for that mode. Dotenv doesn't overwrite variables that are already set, so the first file in the list wins:
+So going from a staging update to a production release doesn't mean touching any CI settings. You change one string, and the change is right there in the commit history. A small settings file in the app repo adds a few rules on top, such as "release builds always include a native build".
 
-```ruby
-before_all do
-  load_version
-  Dir.chdir(@keys_path) do
-    Dotenv.load(".env.app.#{ENV['MODE']}", ".env.app", ".env")
-  end
-  Dotenv.load(File.expand_path('../config/constants.env', __dir__))
-end
-```
+## Starting a build from your laptop
 
-So switching from a staging OTA to a production native build doesn't mean editing CI config. You change one string, and that change shows up in the commit history.
+Running `npm run deploy` in the app repo starts a short interactive script. It:
 
-A small `deploy.json` in the app repo covers the rest, such as "release builds must always include a native build".
+1. Asks which mode you want and whether you need a native build.
+2. Looks up the version that's currently live for that mode and suggests the next one.
+3. Opens an editor so you can write a changelog. This appears in the Slack message and in the app's "what's new" history.
+4. Commits with a message like `BUILD: 2.3.0+staging.hard` and pushes it.
+5. For release builds, also adds a git tag so we can go back to that exact version later.
 
-## Triggering a build from a laptop
+On the Bamboo side, the plan ignores any commit that doesn't start with `BUILD:`. (Bamboo calls this setting "exclude changesets", and it takes a regular expression.) So ordinary pushes to feature branches never start a build. If you want a build, you ask for one. Release builds can also be started by hand from Bamboo.
 
-`npm run deploy` in the app repo is a small Node CLI. It:
+### The first-build surprise
 
-1. Asks which mode and whether you need a native build.
-2. Fetches the currently live version for that mode and suggests the next one.
-3. Opens an editor for the changelog, which ends up in the Slack message and in the in-app "what's new" history file.
-4. Commits with a fixed subject and pushes:
+Bamboo creates a "plan branch" for every new git branch it sees, and it always runs the first build on that branch, even when the commit should have been ignored. So every new feature branch was starting a full iOS and Android build that nobody asked for.
 
-```
-BUILD: 2.3.0+staging.hard
-```
+The fix is a small check that runs at the very start of every build:
 
-5. For release builds, also creates a git tag so we can roll back to it later.
+| Situation                                     | Result |
+| --------------------------------------------- | ------ |
+| Someone started it by hand in Bamboo          | build  |
+| It isn't the branch's first build             | build  |
+| First build, and the latest commit is `BUILD:` | build  |
+| First build, anything else                    | skip   |
 
-On the Bamboo side, the plan's repository has an **exclude changesets** regex. Any commit that doesn't match the `BUILD:` pattern is ignored, so only build commits start a build:
+When the check decides to skip, it asks Bamboo to stop the build and leaves a note for the later steps. If Bamboo doesn't stop in time, each later step sees the note and does nothing, so the build ends green without building anything.
 
-```
-^(?!BUILD:\s[0-9\.\+\w]+staging).*$
-```
+## Where the secrets live
 
-Normal pushes to feature branches don't start a build. When you actually want one, you run a single command. Release builds can still be started by hand from the Bamboo UI.
+We had one rule: **no secrets in either repo, and as few as possible in Bamboo.**
 
-### The plan-branch gotcha
+### Bamboo only holds the key to the vault
 
-Bamboo auto-creates a plan branch for every new git branch, and it **always runs build #1 of that branch while ignoring the exclude regex**. Every new feature branch was starting a full iOS and Android build.
+Bamboo hides the value of any variable whose name includes "secret" or "password", both on its settings screens and in build logs. We keep only a few things there:
 
-The fix is a small guard script that runs first in the Install job:
+- the address, branch and password for the vault
+- the token for installing our private npm packages
+- a few tokens that are needed before the vault is opened (Expo, Sentry and Slack)
 
-| Situation                                  | Result |
-| ------------------------------------------ | ------ |
-| Manually triggered from the Bamboo UI      | build  |
-| Not build #1                               | build  |
-| Build #1, HEAD is a `BUILD: …` commit      | build  |
-| Build #1, anything else                    | skip   |
+If the Bamboo variables aren't there, the scripts fall back to ordinary environment variables, so the same scripts also work on a laptop.
 
-On a skip, it asks Bamboo's REST API to stop the job, and it writes `BUILD_GUARD_SKIP=true` to a shared file that the later jobs read. If the stop call doesn't take effect, every later task still returns early, and the build finishes green having done nothing.
+### Everything else is in the vault
 
-## Secrets: what lives where
-
-The goal was simple: **no secret in either repo, and as few secrets in Bamboo as possible.**
-
-### Bamboo holds just enough to open the vault
-
-Bamboo plan variables whose names contain `secret` or `password` are masked in the UI and in build logs. We store only a handful there:
-
-- the vault git URL, branch and password
-- the npm token for private packages
-- a few tokens that jobs need before the vault is opened (Expo, Sentry, Slack)
-
-`deploy.sh` maps them to normal names once, at the top:
+All the other secrets (the settings for each mode, AWS keys, Play Store and App Store Connect credentials, and the key that signs OTA updates) live in a `secrets/` folder in the tools repo. Git ignores that folder, so it can't be committed. Instead, a fastlane plugin called [cryptex](https://github.com/hjanuschka/fastlane-plugin-cryptex) encrypts the folder and stores it on a separate git branch. Two commands move it back and forth:
 
 ```bash
-export VAULT_PASSWORD="${bamboo_VAULT_PASSWORD:-${VAULT_PASSWORD:-}}"
-export VAULT_GIT_URL="${bamboo_VAULT_GIT_URL:-${VAULT_GIT_URL:-}}"
-export EXPO_TOKEN="${bamboo_EXPO_SECRET:-${EXPO_TOKEN:-}}"
+bundle exec fastlane pull_vault   # download and decrypt into secrets/
+bundle exec fastlane init_vault   # encrypt secrets/ and upload it
 ```
 
-The `${bamboo_X:-${X:-}}` fallback means the same script runs on a laptop with plain env vars.
+We patched cryptex to use a stronger way of turning the password into an encryption key (PBKDF2, instead of the plugin's single round of hashing). Machines with the old code could still read the old format, so we waited until every machine had the patch before re-encrypting.
 
-### Everything else is in an encrypted vault
+### iOS signing certificates
 
-The rest (per-mode `.env` files, AWS keys, the Play Store service account, the App Store Connect API key, the OTA signing key) lives in a `secrets/` folder that is **gitignored** in the tools repo. It is synced to and from an encrypted branch with the [cryptex](https://github.com/hjanuschka/fastlane-plugin-cryptex) fastlane plugin:
+Apple's signing certificates and provisioning profiles are handled by fastlane's `match` tool, which keeps them encrypted in git on their own branch. Before each build, the scripts create a temporary keychain and unlock it. Without that, macOS would pop up a password prompt in the middle of the build, and on a machine nobody is watching, the build would just sit there waiting.
 
-```bash
-bundle exec fastlane pull_vault   # decrypt the vault branch into secrets/
-bundle exec fastlane init_vault   # encrypt secrets/ and push it to the vault branch
-```
+### Settings that aren't secret
 
-We patched cryptex to derive its key with PBKDF2 instead of the plugin's default single-pass hash. Hosts running the old code can still read the old vault format, so we only re-encrypted once every machine had the patch.
+App names, team IDs, storage bucket names, CDN addresses and Slack channel IDs aren't secrets, but they used to be copied into a dozen different scripts. Now they live in one settings file that both the shell scripts and fastlane read. A comment at the top of the file spells out the rule: **new settings go here, secrets never do.**
 
-### iOS signing goes through match
+### A list of every secret
 
-Certificates and provisioning profiles are handled by fastlane `match`, in the same encrypted git storage on a separate branch. Before building, CI creates a temporary keychain and unlocks it, so `codesign` never shows a GUI prompt on a headless agent:
-
-```ruby
-lane :create_match_keychain do
-  create_keychain(
-    name: ENV['MATCH_KEYCHAIN_NAME'],
-    password: ENV['MATCH_KEYCHAIN_PASSWORD'],
-    default_keychain: true,
-    unlock: true,
-    timeout: 3600
-  )
-end
-```
-
-### Non-secret config goes in `constants.env`
-
-App names, scheme names, team IDs, bucket names, CDN hosts and Slack channel IDs aren't secrets, but they used to be hardcoded across a dozen scripts. Now they all live in one `config/constants.env` that both the shell scripts and fastlane load. The rule is written at the top of the file: **new hardcoded values go here, secrets never do.**
-
-### A rotation map
-
-We also keep a doc that lists every secret, where it's stored, and what else has to change when it's rotated. For example, the OTA signing key has to match a certificate that ships inside the native app. You'll be glad you wrote this down the first time a key expires at 6pm on a Friday.
+We also keep a document listing every secret, where it's stored, and what else has to change when it's replaced. Some secrets depend on each other. For example, the key that signs OTA updates has to match a certificate built into the app itself. You'll be glad you wrote this down the first time a key expires at 6pm on a Friday.
 
 ## The Bamboo plan
 
-The plan has three stages. Each job is one Script task:
+A Bamboo plan is split into stages, and each stage has one or more jobs. Ours has three stages, and every job is the same two lines: load the main script from the tools repo, then call one function.
 
 ```bash
 source "${bamboo_build_working_directory}/tools/scripts/deploy.sh"
-TaskInstall        # or TaskDeployIOS / TaskDeployAndroid / TaskClean
+TaskInstall        # or TaskDeployIOS, TaskDeployAndroid, TaskClean
 ```
 
 ### Stage 1: Install
 
-```bash
-function TaskInstall() {
-  TaskSetupEnvironment          # paths, written to a .common file for later jobs
-  TaskClone                     # shallow-clone the app at the triggering branch
-  TaskBuildGuard || return 0    # skip the build Bamboo forces on new plan branches
-  ValidateReleaseBranch         # release builds only from allowed branches
+This job gets everything ready. It downloads the app code, runs the first-build check from earlier, decrypts the vault, installs the npm packages, and generates the native iOS and Android projects with Expo.
 
-  cd "$FASTLANE_TOOLS_PATH"
-  bundle install
-  bundle exec fastlane pull_vault             || exit 1
-  bundle exec fastlane verify_aws_credentials || exit 1
+Two checks in this job have saved us a lot of time:
 
-  cd "$FASTLANE_ROOT_PATH"
-  echo "//registry.npmjs.org/:_authToken=${NPM_SECRET}" >> .npmrc
-  npm ci
-  npm run prebuild cicd android
-}
-```
+- **It tests the AWS keys straight away** by uploading a small test file to the storage bucket and then deleting it. Before we added this, a replaced AWS key would only fail at the very end, after 20 minutes of building. Now it fails in the first minute. The test writes a file instead of just reading one, because a key can be allowed to read a bucket without being allowed to write to it.
+- **Release builds can only come from certain branches.** If someone starts a release build from any other branch, the job fails and posts a red alert in Slack. That way a release can't slip out of a feature branch by mistake.
 
-Two things here saved us a lot of time:
+### Stage 2: Build and ship (iOS and Android at the same time)
 
-- **`verify_aws_credentials` writes a test object to the bucket and deletes it.** Before this check, a rotated AWS key failed the S3 upload after a 20-minute build. Now it fails in the first minute. It does a write, not a read, because a key can be allowed to read a bucket it can't write to.
-- **Release builds are only allowed from specific branches.** A `+release` version on any other branch fails the job and posts a red Slack alert, so a release can't come from a feature branch by accident.
+Both platforms follow the same steps:
 
-### Stage 2: Deploy (iOS and Android in parallel)
+1. Update the changelog history.
+2. For a soft build, publish the OTA update to the right channel.
+3. For a hard build, build the app and upload it. iOS goes to TestFlight. Android goes to S3 or the Play Store.
+4. Upload a small file that the app checks to see whether a new version is out and whether users must update.
+5. Upload source maps, so crash reports point at real lines of code.
+6. Clear the CDN cache and send the Slack message.
 
-Both platforms go through the same fastlane steps:
-
-```
-update_history → deploy_soft (OTA) → build + deploy_hard (native)
-              → upload_version → upload_sourcemap → invalidate CDN → notify
-```
-
-- **Soft** runs `eas update` to publish a signed OTA bundle to the channel for that mode.
-- **Hard** builds with `gym` / Gradle, uploads the IPA to TestFlight and the APK/AAB to S3 or the Play Store, then writes a small `<mode>-<platform>.json` that the app checks to see whether a forced update is available.
-
-Both jobs run in the same checkout at the same time, so they can't share anything that gets wiped. The one that bit us was Metro's cache: each bundle's `--reset-cache` deleted the other job's cache halfway through its build. Android now gets its own cache directory:
+Since both jobs run in the same folder at the same time, they can't share anything that one of them might delete. That's how Metro's cache caught us out. (Metro is the tool that bundles the app's JavaScript.) Each build cleared the cache when it started, which wiped the other build's cache halfway through. The fix was to give Android its own cache folder:
 
 ```bash
 export EXPO_METRO_CACHE_OUTPUT_DIR="$FASTLANE_ROOT_PATH/android/.metro-cache"
 ```
 
-### Stage 3: Clean
+### Stage 3: Clean up
 
-Deletes the app and tools checkouts. Caches stay outside the working directory, so they survive.
+This deletes the app and tools code from the machine. The caches are stored somewhere else, so they're kept for the next build.
 
-## Making a single Mac fast
+## Making one Mac fast
 
-With hosted CI, every build starts on a fresh machine. On your own hardware, you can keep caches between builds:
+Hosted CI gives you a fresh machine for every build, so each build starts from nothing. On your own machine, you can keep work from one build to the next:
 
-- **ccache** for native C/C++/Obj-C. React Native's Xcode integration already supports it. Point the cache at a stable directory, set `CCACHE_BASEDIR` so absolute paths from different checkout folders still hit the cache, and evict old entries now and then:
+- **Cache compiled native code.** ccache remembers compiled C, C++ and Objective-C files, so files that haven't changed don't get compiled again. React Native's Xcode setup already supports it. Keep the cache in a fixed folder, and clear out old entries now and then:
 
   ```bash
   export CCACHE_DIR="$HOME/Library/Caches/ccache"
@@ -282,75 +206,77 @@ With hosted CI, every build starts on a fresh machine. On your own hardware, you
   ccache --evict-older-than 21d
   ```
 
-- **Bundler gems outside the checkout.** Set `BUNDLE_PATH` to a directory in `~/.cache`. Watch out for a tracked `.bundle/config` with `path: vendor/bundle`, because Bundler ranks that file above env vars. Set `BUNDLE_APP_CONFIG` to another directory so Bundler skips the file. Clear the gem cache once it passes a size limit.
-- **Bundle JS while Xcode compiles.** A prebundle script starts the Metro bundle in the background right before `gym`, so the JS bundle builds during the native compile instead of after it.
-- **Upload to TestFlight through the App Store Connect API** instead of `altool`. The API path skips a slow duplicate-build-number check, which saved over a minute per upload.
+  The `CCACHE_BASEDIR` line lets builds share the cache even though each one checks the code out into a different folder.
 
-Also set `GIT_PAGER=cat` and `CI=true`. fastlane runs git through a PTY, and without the pager override `less` waits for input forever and the agent hangs.
+- **Keep Ruby gems between builds.** Tell Bundler (Ruby's package installer) to store gems in a folder outside the checkout, so they aren't downloaded again every time. One catch: if the project has a committed Bundler settings file that says something different, Bundler follows that file over your environment variables. Pointing `BUNDLE_APP_CONFIG` at another folder makes Bundler ignore it.
+- **Bundle the JavaScript while Xcode compiles.** A small script starts bundling the JavaScript in the background just before the iOS build begins, so the two happen at once instead of one after the other.
+- **Upload to TestFlight with the App Store Connect API.** The older upload tool (`altool`) first runs a slow check for duplicate build numbers. Switching to the API saved more than a minute on every upload.
 
-## Telling people about it
+One more thing: set `GIT_PAGER=cat` and `CI=true` on the machine. fastlane runs some git commands as if a person were at the keyboard. Without these settings, git opens its pager and waits for someone to press a key. Nobody ever does, so the build hangs.
 
-The last step builds a Slack Block Kit message with the version, mode, branch, commit, build size compared to the live build, the changelog, and the commits since the last release tag. The message builder is a plain Ruby function with unit tests, because it's the part people actually read.
+## Letting people know
 
-For iOS, "uploaded" doesn't mean "available in TestFlight". Apple processes builds for several minutes after upload. So `deploy` prepares the message and starts a small detached watcher. The watcher polls App Store Connect and posts once Apple finishes processing, with an **Open in TestFlight** button. If Apple rejects the build, it posts the failure with Apple's reason.
+The last step posts a Slack message with the version, mode, branch and commit, how the app's size compares with the live version, the changelog, and the commits since the last release. The code that builds this message has its own tests, because it's the part people actually read.
 
-## Promoting a release
+On iOS there's a catch: "uploaded" doesn't mean "ready to test". Apple spends several minutes processing each build after it's uploaded. So instead of posting straight away, the build starts a small watcher in the background. It keeps checking with App Store Connect and posts once Apple is done, with an **Open in TestFlight** button. If Apple rejects the build, it posts that too, along with Apple's reason.
 
-Production builds don't go live as soon as they finish. They upload to a `release/` prefix in S3, and OTA updates go to a holding branch that no channel points at. QA tests from there.
+## Releasing to users
 
-A separate Bamboo plan, run by hand, does the promotion:
+Production builds don't go live the moment they finish. Native builds are uploaded to a holding area in S3, and OTA updates go to a holding branch that no users are connected to. QA tests from there.
 
-1. Moves the release JSON and APK from `release/` into the live prefix.
-2. Republishes the OTA from the holding branch onto the live branch, then clears the holding branch.
-3. Invalidates the CDN.
+When QA is happy, someone runs a separate Bamboo plan by hand. It:
 
-Shipping a release and making it live are separate steps, and the second one is a button a person has to press.
+1. Moves the release files from the holding area to the live location.
+2. Republishes the OTA update to the live branch and empties the holding branch.
+3. Clears the CDN cache so users get the new files.
+
+Building a release and making it live are separate steps, and the second one always needs a person to press the button.
 
 ## What it costs
 
-Most of the pitch for self-hosting is cost, so here are actual numbers.
+Saving money is the main reason people self-host, so here are real numbers.
 
-**How much we build.** I counted `BUILD:` commits in the app repo. Over the last six months we averaged about 37 builds a month. A busy release month hits 50 or more, and almost all of those are native ("hard") builds.
+**How often we build.** I counted the `BUILD:` commits in the app repo. Over the last six months we averaged about 37 builds a month. A busy release month goes past 50, and almost all of those are full native builds.
 
-**How long a build takes** on the warm Mac, measured from Bamboo logs for a native build:
+**How long a build takes**, measured from Bamboo's logs for a native build on the Mac with its caches warm:
 
-| Job       | Time    | Where the time goes                                    |
-| --------- | ------- | ------------------------------------------------------ |
-| Install   | ~1 min  | npm install, vault decrypt                             |
-| Android   | ~6 min  | `assembleRelease` ~5.5 min, S3 uploads                 |
-| iOS       | ~13 min | prebuild + pods ~1.3 min, archive ~7 min, upload ~3.5 min |
-| Clean     | &lt;1 min |                                                        |
+| Step     | Time    | Where the time goes                                                  |
+| -------- | ------- | -------------------------------------------------------------------- |
+| Install  | ~1 min  | Installing npm packages, decrypting the vault                        |
+| Android  | ~6 min  | Building the app (~5.5 min), uploading to S3                         |
+| iOS      | ~13 min | Setting up the project (~1.3 min), building (~7 min), uploading (~3.5 min) |
+| Clean up | &lt;1 min |                                                                    |
 
-iOS and Android run in parallel, so a native build finishes in about **15 minutes** from push to TestFlight. Release builds archive iOS twice (store and ad-hoc), so they take a bit longer.
+iOS and Android build at the same time, so a native build takes about **15 minutes** from push to TestFlight. Release builds take a little longer, because iOS gets built twice: once for the App Store and once for direct installs.
 
-**Monthly cost at 50 native builds**, compared with hosted options:
+**Monthly cost at 50 native builds**, compared with hosted services:
 
-| Option                          | How it's priced                                  | ~Per month         |
-| ------------------------------- | ------------------------------------------------ | ------------------ |
-| **Self-hosted Mac**             | Mac mini (~$600–1,400) spread over 3 years, plus power | **~$20–45**  |
-| GitHub Actions, hosted macOS    | $0.062/min, ~30 min per build with cold caches   | ~$95               |
-| EAS Build, large workers        | $4 per iOS build + $2 per Android build          | ~$300, minus plan credit |
+| Option                      | How it's priced                                              | Per month              |
+| --------------------------- | ------------------------------------------------------------ | ---------------------- |
+| **Our own Mac**             | A Mac mini ($600–1,400) spread over 3 years, plus electricity | **$20–45**             |
+| GitHub Actions, hosted Mac  | $0.062 a minute, about 30 minutes a build without our caches  | ~$95                   |
+| EAS Build, large machines   | $4 per iOS build plus $2 per Android build                   | ~$300, minus plan credit |
 
-Some notes on how I got these:
+How I got these numbers:
 
-- **Power is close to nothing.** A Mac mini idles at a few watts and draws well under 100 W while building. Running it all month adds only a few dollars.
-- **The hosted estimate assumes builds take twice as long.** A fresh hosted runner starts with no ccache, gem cache or warm DerivedData. If your hosted builds are faster than that, the gap is smaller. Running Android on a Linux runner would bring it down too.
-- **Hosted prices change.** Check the current [GitHub Actions runner pricing](https://docs.github.com/en/billing/reference/actions-runner-pricing) and [EAS pricing](https://expo.dev/pricing) before using these numbers.
-- **Bamboo cost us nothing extra.** The company already had a Bamboo Data Center license, and the Mac is one more remote agent. If you're starting from scratch, I wouldn't pick Bamboo now. Atlassian has set [Data Center end-of-life for March 2029](https://www.atlassian.com/licensing/bamboo). The rest of this setup doesn't depend on Bamboo, though. Because each job is just "source a script, call a function", moving to GitHub Actions or Buildkite on the same Mac would mostly mean rewriting a few lines of job config.
-- **EAS Update isn't in this table.** We still use it for OTA updates, and it's priced separately by monthly active users.
+- **Electricity barely registers.** A Mac mini uses a few watts when idle and well under 100 W while building. Running it all month costs a few dollars.
+- **I assumed hosted builds take twice as long.** A fresh hosted machine starts without any of our caches. If your hosted builds are quicker than that, the gap is smaller. Building Android on a cheaper Linux machine would also bring the cost down.
+- **Hosted prices change.** Check the current [GitHub Actions pricing](https://docs.github.com/en/billing/reference/actions-runner-pricing) and [EAS pricing](https://expo.dev/pricing) before relying on these numbers.
+- **Bamboo didn't cost anything extra.** The company already paid for Bamboo Data Center, and the Mac is just one more agent. If you're starting fresh, I wouldn't pick Bamboo today, because Atlassian is [ending Data Center support in March 2029](https://www.atlassian.com/licensing/bamboo). But nothing else here depends on Bamboo. Every job just runs one function from a script, so moving to GitHub Actions or Buildkite on the same Mac would mostly mean rewriting a few lines of job settings.
+- **OTA updates aren't included.** We still use EAS Update for those, and it's priced separately, based on monthly active users.
 
-**The cost that isn't in the table is your time.** Someone has to install Xcode updates, renew certificates, clear a full disk and restart a stuck agent. For us that's a few hours a month, which is more than the price difference with GitHub Actions on its own.
+**What the table leaves out is your time.** Someone has to install Xcode updates, renew certificates, free up disk space and restart the agent when it gets stuck. For us that's a few hours a month, and that time alone is worth more than the difference from GitHub Actions.
 
-So what we actually get for self-hosting isn't mainly a lower bill. It's **15-minute native builds** thanks to warm caches, no per-build cost to think about before pushing, and the ability to SSH in and check what went wrong. If you only ship a couple of builds a month, a hosted service is probably the better choice.
+So the real win isn't a smaller bill. It's **15-minute native builds** thanks to warm caches, never having to think about what a build costs before pushing, and being able to log into the machine to see what went wrong. If you only ship a couple of builds a month, a hosted service is probably the better choice.
 
-## What I'd tell you if you're building one
+## If you're building one yourself
 
-- **Keep Bamboo thin.** One script task per job, with all logic in a repo. You get code review, history and rollback for your CI.
-- **Encode build intent in the commit, not the CI UI.** A version string with flags is easy to read and easy to audit.
-- **Fail fast on credentials.** Check every external dependency in the first minute, not at the end of the build.
-- **Put secrets in exactly one place, and document it.** A gitignored folder synced to an encrypted vault, plus a rotation map.
-- **Add escape hatches.** We have plan variables like `SKIP_IOS`, `SKIP_ANDROID`, `DISABLE_SLACK_NOTIFICATIONS` and `OTA_KEEP_DUPLICATES`. Each one exists because we needed it during an incident.
-- **Count your builds before deciding.** Self-hosting pays off at dozens of native builds a month. At a few a month, the upkeep costs more than a hosted service.
-- **Expect CI-specific quirks.** Pagers, shared caches, Bamboo's forced first build, keychains on a headless Mac. Each one cost us an afternoon. Write a comment next to every workaround saying why it's there.
+- **Keep your CI tool thin.** Each job should just call a script from a repo. Then your build setup gets code review, history and rollback like the rest of your code.
+- **Decide what to build in the commit, not in the CI settings.** A version number with a few flags is easy to read and easy to look back on.
+- **Check credentials first.** Test every outside service in the first minute, not at the end of a 20-minute build.
+- **Keep secrets in one place, and write down where they are.** A folder git ignores, synced to an encrypted vault, plus a list of what to change when each secret is replaced.
+- **Give yourself off switches.** We have settings to skip iOS, skip Android, turn off Slack messages and allow duplicate OTA updates. Each one exists because we needed it during an outage.
+- **Count your builds before you decide.** Running your own Mac pays off at dozens of native builds a month. At a handful, the upkeep costs more than a hosted service.
+- **Expect odd problems that only happen in CI.** Git waiting for a keypress, two builds sharing a cache, Bamboo's surprise first build, keychain prompts on a Mac nobody is watching. Each one cost us an afternoon. Leave a comment next to every workaround explaining why it's there.
 
-It's more work than a hosted service, but native builds now take about 15 minutes and cost a few dollars a month in hardware, the whole system is in git, and when something breaks you can SSH into the machine and see exactly what happened.
+It's more work than a hosted service. But native builds now take about 15 minutes, the Mac costs $20–45 a month, the whole system lives in git, and when something breaks you can log into the machine and see exactly what happened.

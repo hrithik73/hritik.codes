@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 import { rehypePrettyCode } from "rehype-pretty-code";
+import remarkGfm from "remark-gfm";
 import { ViewCounter } from "~/components/view-counter";
 import { siteUrl } from "~/config/site";
 import { formatPostDate, getPost, getPostSlugs } from "~/lib/posts";
@@ -50,6 +51,8 @@ export default async function BlogPost({ params }: Props) {
     Fragment,
     jsx,
     jsxs,
+    // GFM adds tables. singleTilde off so "~5 min" approximations aren't read as strikethrough.
+    remarkPlugins: [[remarkGfm, { singleTilde: false }]],
     rehypePlugins: [
       [
         rehypePrettyCode,

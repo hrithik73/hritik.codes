@@ -73,6 +73,33 @@ export const mdxComponents: MDXComponents = {
     </blockquote>
   ),
   hr: () => <hr className="my-8 border-line" />,
+  table: ({ children }) => (
+    <div className="mb-6 overflow-x-auto rounded-lg border border-line">
+      <table className="w-full border-collapse text-sm">{children}</table>
+    </div>
+  ),
+  thead: ({ children }) => (
+    <thead className="bg-surface border-b border-line">{children}</thead>
+  ),
+  tr: ({ children }) => (
+    <tr className="border-b border-line last:border-b-0">{children}</tr>
+  ),
+  th: ({ children, style }) => (
+    <th
+      style={style}
+      className="px-3 py-2 text-left font-semibold text-ink whitespace-nowrap"
+    >
+      {children}
+    </th>
+  ),
+  td: ({ children, style }) => (
+    <td
+      style={style}
+      className="px-3 py-2 align-top text-ink/90 leading-relaxed"
+    >
+      {children}
+    </td>
+  ),
 };
 
 export function useMDXComponents(
