@@ -1,22 +1,29 @@
 import { SeverityNumber } from "@opentelemetry/api-logs";
 import { after, NextResponse } from "next/server";
+import { isLocalRequest } from "~/lib/is-local-request";
 import { posthogLogger, posthogLoggerProvider } from "~/lib/posthog-logger";
 import { redis } from "~/lib/redis";
 
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ slug: string }> },
-) {
-  const { slug } = await params;
-  const views = (await redis.get<number>(`views:${slug}`)) ?? 0;
-  return NextResponse.json({ views });
+type Context = { params: Promise<{ slug: string }> };
+
+async function getViews(slug: string) {
+  return (await redis.get<number>(`views:${slug}`)) ?? 0;
 }
 
-export async function POST(
-  _req: Request,
-  { params }: { params: Promise<{ slug: string }> },
-) {
+export async function GET(_req: Request, { params }: Context) {
   const { slug } = await params;
+  return NextResponse.json({ views: await getViews(slug) });
+}
+
+export async function POST(req: Request, { params }: Context) {
+  const { slug } = await params;
+
+  // Local dev and `next start` share the production Redis, so don't let our
+  // own visits inflate the counts. Spoofing Host only skips a view.
+  if (isLocalRequest(req)) {
+    return NextResponse.json({ views: await getViews(slug) });
+  }
+
   const views = await redis.incr(`views:${slug}`);
 
   posthogLogger?.emit({
