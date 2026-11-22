@@ -17,38 +17,69 @@ const LABELS: Record<string, string> = {
   dark: "Switch to system theme",
 };
 
+const CLICK_DURATION = 0.035;
+
+// One shared context: creating a new AudioContext per click means the audio
+// device has to spin up every time, and that startup latency often swallows
+// the entire 35ms click — which is why the sound was intermittent.
+let audioCtx: AudioContext | null = null;
+let clickBuffer: AudioBuffer | null = null;
+
+function getAudio() {
+  if (!audioCtx) {
+    audioCtx = new AudioContext();
+    const size = Math.floor(audioCtx.sampleRate * CLICK_DURATION);
+    clickBuffer = audioCtx.createBuffer(1, size, audioCtx.sampleRate);
+    const data = clickBuffer.getChannelData(0);
+    for (let i = 0; i < size; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / size, 10);
+    }
+  }
+  return { ctx: audioCtx, buffer: clickBuffer! };
+}
+
+function scheduleClick(ctx: AudioContext, buffer: AudioBuffer) {
+  // Small lead time so the start isn't already in the past when rendered.
+  const start = ctx.currentTime + 0.005;
+
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = "bandpass";
+  filter.frequency.value = 1400;
+  filter.Q.value = 0.7;
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.35, start);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + CLICK_DURATION);
+
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  noise.start(start);
+  noise.onended = () => {
+    noise.disconnect();
+    filter.disconnect();
+    gain.disconnect();
+  };
+}
+
 function playClickSound() {
   if (typeof window === "undefined") return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   try {
-    const ctx = new AudioContext();
-    const now = ctx.currentTime;
-
-    const bufferSize = Math.floor(ctx.sampleRate * 0.035);
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 10);
+    const { ctx, buffer } = getAudio();
+    if (ctx.state !== "running") {
+      // Safari can create contexts suspended / mark them "interrupted".
+      ctx
+        .resume()
+        .then(() => scheduleClick(ctx, buffer))
+        .catch(() => {});
+    } else {
+      scheduleClick(ctx, buffer);
     }
-
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-
-    const filter = ctx.createBiquadFilter();
-    filter.type = "bandpass";
-    filter.frequency.value = 1400;
-    filter.Q.value = 0.7;
-
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.35, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
-
-    noise.connect(filter);
-    filter.connect(gain);
-    gain.connect(ctx.destination);
-
-    noise.start(now);
-    noise.onended = () => ctx.close();
   } catch {}
 }
 
