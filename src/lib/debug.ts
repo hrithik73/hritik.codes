@@ -5,7 +5,6 @@
 
 export const DEBUG_ENABLED_KEY = "debug:enabled";
 export const DARK_PALETTE_KEY = "debug:dark-palette";
-export const SHELF_KEY = "debug:shelf";
 export const ZOOM_KEY = "debug:zoom";
 export const PAGE_WIDTH_KEY = "debug:page-width";
 
@@ -52,20 +51,6 @@ export const DARK_PALETTES: DarkPalette[] = [
   },
 ];
 
-/** The plain `.shelf` look in globals.css; selecting it removes the attribute. */
-export const DEFAULT_SHELF = "cubby";
-
-export type ShelfStyle = { id: string; label: string; note: string };
-
-// Styles for each live in globals.css under [data-shelf="…"] .shelf
-export const SHELF_STYLES: ShelfStyle[] = [
-  { id: "cubby", label: "Cubby", note: "default" },
-  { id: "ledge", label: "Ledge", note: "surface band" },
-  { id: "hairline", label: "Hairline", note: "1px rule" },
-  { id: "accent", label: "Accent", note: "accent lip" },
-  { id: "plank", label: "Plank", note: "3D" },
-];
-
 /** Whole-page zoom preview (CSS `zoom` on <html>, like browser zoom). 1 = as shipped. */
 export const DEFAULT_ZOOM = 1;
 export const ZOOM_MIN = 0.7;
@@ -83,4 +68,4 @@ export const PAGE_WIDTH_MAX = 80;
 export const PAGE_WIDTH_STEP = 1;
 
 /** Runs in <head> before first paint so saved previews don't flash. */
-export const debugPrePaintScript = `try{var r=document.documentElement,l=localStorage,p=l.getItem(${JSON.stringify(DARK_PALETTE_KEY)}),s=l.getItem(${JSON.stringify(SHELF_KEY)}),z=l.getItem(${JSON.stringify(ZOOM_KEY)}),w=l.getItem(${JSON.stringify(PAGE_WIDTH_KEY)});if(p)r.setAttribute("data-dark-palette",p);if(s)r.setAttribute("data-shelf",s);if(z)r.style.zoom=z;if(w&&+w){r.style.setProperty("--debug-page-width",w+"rem");r.setAttribute("data-page-width","")}}catch(e){}`;
+export const debugPrePaintScript = `try{var r=document.documentElement,l=localStorage,p=l.getItem(${JSON.stringify(DARK_PALETTE_KEY)}),z=l.getItem(${JSON.stringify(ZOOM_KEY)}),w=l.getItem(${JSON.stringify(PAGE_WIDTH_KEY)});if(p)r.setAttribute("data-dark-palette",p);if(z)r.style.zoom=z;if(w&&+w){r.style.setProperty("--debug-page-width",w+"rem");r.setAttribute("data-page-width","")}}catch(e){}`;

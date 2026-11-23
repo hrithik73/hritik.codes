@@ -91,6 +91,8 @@ html {
 body {
   background: var(--bg);
   color: var(--ink);
+  /* full-bleed sections (the /books shelf) use 100vw; never scroll sideways */
+  overflow-x: clip;
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
@@ -665,159 +667,154 @@ pre[data-theme] .line--highlighted {
 }
 
 /*
- * /books shelves. A flex-wrap row of books where every line is exactly one
- * --row tall, so a background gradient repeating every --row draws a plank
- * under each line, however many lines the list wraps onto. Books stand on the
- * plank's top face at their true proportions; a library tag sits below.
+ * /books shelf (src/components/book-shelf.tsx). Every book is a zero-size
+ * 3D box at the stage's centre: a spine face pushed forward by half the
+ * book's depth, and a cover face turned 90° onto its right side. JS sets
+ * each box's transform; --hpx is the book height, --ws/--dd its spine
+ * width and depth (the cover's width).
  */
-.shelf {
-  --book-h: 8.5rem;
-  --head: 1.25rem; /* room above for the hover lift */
-  --label: 4.25rem;
-
-  /* Look of the shelf: a backdrop behind the books, then up to two bands
-     under them (top face, front edge) and a fading shade. The default is
-     "cubby"; the debug menu previews the others via <html data-shelf>. */
-  --backdrop: var(--surface);
-  --top: 0px;
-  --plank-top: var(--line);
-  --front: 1px;
-  --plank-front: var(--line);
-  --shade: 0px;
-  --plank-shade: transparent;
-  --book-shadow: 0 1px 2px oklch(0 0 0 / 0.12), 0 6px 14px -10px oklch(0 0 0 / 0.35);
-
-  --plank-at: calc(var(--head) + var(--book-h));
-  --plank-end: calc(var(--plank-at) + var(--top) + var(--front));
-  --row: calc(var(--plank-end) + var(--label));
-
-  /* The plank runs a little past the outermost books, like a real shelf */
-  margin-inline: -0.75rem;
-  padding-inline: 0.75rem;
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 1.25rem;
-  row-gap: 0;
-  background-image: linear-gradient(
-    to bottom,
-    var(--backdrop) var(--plank-at),
-    var(--plank-top) var(--plank-at) calc(var(--plank-at) + var(--top)),
-    var(--plank-front) calc(var(--plank-at) + var(--top)) var(--plank-end),
-    var(--plank-shade) var(--plank-end),
-    transparent calc(var(--plank-end) + var(--shade))
-  );
-  background-size: 100% var(--row);
-}
-[data-shelf="ledge"] .shelf {
-  --backdrop: transparent;
-  --top: 1px;
-  --front: 8px;
-  --plank-front: var(--surface);
-}
-[data-shelf="hairline"] .shelf {
-  --backdrop: transparent;
-  --top: 0px;
-  --front: 1px;
-  --plank-front: var(--line);
-}
-[data-shelf="accent"] .shelf {
-  --backdrop: transparent;
-  --top: 0px;
-  --front: 2px;
-  --plank-front: var(--accent);
-}
-/* Plank: a real shelf in perspective. The top face darkens toward the wall,
-   a lit lip runs along its front, then the front face and a soft shadow
-   below. Books sink a few px into the top face so they stand on it. */
-[data-shelf="plank"] .shelf {
-  --top: 9px;
-  --front: 10px;
-  --shade: 16px;
-  --pk-back: color-mix(in oklab, var(--line), var(--ink) 12%);
-  --pk-top: color-mix(in oklab, var(--line), var(--bg) 35%);
-  --pk-lip: var(--bg);
-  --pk-front: var(--line);
-  --pk-bottom: color-mix(in oklab, var(--line), var(--ink) 18%);
-  --pk-shade: oklch(0 0 0 / 0.1);
-  --book-shadow: 0 2px 3px -1px oklch(0 0 0 / 0.3), 0 10px 20px -12px oklch(0 0 0 / 0.45);
-  background-image: linear-gradient(
-    to bottom,
-    transparent var(--plank-at),
-    var(--pk-back) var(--plank-at),
-    var(--pk-top) calc(var(--plank-at) + var(--top)),
-    var(--pk-lip) calc(var(--plank-at) + var(--top)),
-    var(--pk-lip) calc(var(--plank-at) + var(--top) + 1px),
-    var(--pk-front) calc(var(--plank-at) + var(--top) + 1px),
-    var(--pk-front) calc(var(--plank-end) - 1px),
-    var(--pk-bottom) calc(var(--plank-end) - 1px),
-    var(--pk-bottom) var(--plank-end),
-    var(--pk-shade) var(--plank-end),
-    transparent calc(var(--plank-end) + var(--shade))
-  );
-}
-.dark[data-shelf="plank"] .shelf {
-  --pk-back: color-mix(in oklab, var(--line), var(--bg) 60%);
-  --pk-top: var(--line);
-  --pk-lip: color-mix(in oklab, var(--line), var(--ink) 28%);
-  --pk-front: color-mix(in oklab, var(--line), var(--bg) 20%);
-  --pk-bottom: color-mix(in oklab, var(--line), var(--bg) 65%);
-  --pk-shade: oklch(0 0 0 / 0.45);
-}
-[data-shelf="plank"] .shelf-book {
-  top: 4px;
-}
-@media (min-width: 640px) {
-  .shelf {
-    --book-h: 10rem;
-    column-gap: 1.5rem;
-  }
-}
-@media (min-width: 1024px) {
-  .shelf {
-    --book-h: 11.5rem;
-    column-gap: 2rem;
-  }
-}
-
-.shelf > li {
-  height: var(--row);
-}
-.shelf-slot {
-  display: grid;
-  height: 100%;
-  grid-template-rows: var(--head) var(--book-h) calc(var(--top) + var(--front)) 1fr;
-}
-.shelf-book {
-  grid-row: 2;
+.bk-fit {
+  /* Full-bleed: the shelf runs the width of the window */
   position: relative;
-  display: block;
-  height: var(--book-h);
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  height: calc(var(--hpx, 360px) * 1.3);
   overflow: hidden;
-  border-radius: 2px 3px 3px 2px;
-  box-shadow: var(--book-shadow);
-  transition: translate 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  perspective: 2200px;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 }
-/* Spine: a crease of shadow then light along the left edge */
-.shelf-book::after {
+.bk-fit:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--primary) 60%, transparent);
+  outline-offset: -4px;
+}
+.bk-stage {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  transform-style: preserve-3d;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.bk-stage.bk-ready {
+  opacity: 1;
+}
+.bk-book {
+  position: absolute;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.bk-face {
+  position: absolute;
+  height: var(--hpx);
+  top: calc(var(--hpx) * -0.5);
+  border-radius: 2px;
+  backface-visibility: hidden;
+}
+/* Spines darken as they turn away; covers darken when seen edge-on */
+.bk-face::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
+  background: #000;
+  opacity: var(--shade, 0);
   pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    oklch(0 0 0 / 0.18) 0,
-    oklch(1 0 0 / 0.16) 3px,
-    oklch(0 0 0 / 0.06) 7px,
-    transparent 12px
-  );
-  box-shadow: inset 0 0 0 1px oklch(0 0 0 / 0.08);
 }
-.shelf-slot:hover .shelf-book,
-.shelf-slot:focus-visible .shelf-book {
-  translate: 0 -6px;
+.bk-spine {
+  --shade: var(--sp-shade, 0);
+  width: var(--ws);
+  left: calc(var(--ws) * -0.5);
+  transform: translateZ(calc(var(--dd) / 2));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  color: var(--fg);
+  /* Rounded spine: shadow at both edges, a soft highlight down the middle */
+  background:
+    linear-gradient(90deg, #0004, #0000 16%, #fff2 50%, #0000 84%, #0004),
+    var(--bg);
+  box-shadow:
+    inset 0 1px #fff3,
+    inset 0 -2px 3px #0003;
 }
-.shelf-label {
-  grid-row: 4;
-  padding-top: 0.6rem;
+.bk-band {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 11%;
+  background: var(--band);
+  color: var(--band-fg);
+  font-style: normal;
+  font-weight: 650;
+  font-size: calc(var(--hpx) * 0.03);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.bk-title,
+.bk-author {
+  writing-mode: vertical-rl;
+  overflow: hidden;
+  line-height: 1.05;
+}
+.bk-title {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: 9%;
+  text-align: center;
+  font-weight: 700;
+  font-size: calc(var(--hpx) * 0.04);
+  letter-spacing: -0.005em;
+}
+.bk-author {
+  flex: none;
+  max-height: 32%;
+  padding-bottom: 9%;
+  font-weight: 600;
+  font-size: calc(var(--hpx) * 0.021);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.bk-cover {
+  --shade: var(--cv-shade, 0);
+  width: var(--dd);
+  left: calc(var(--dd) * -0.5);
+  transform: rotateY(90deg) translateZ(calc(var(--ws) / 2));
+  background-color: var(--bg);
+  background-size: 100% 100%;
+  box-shadow: 0 30px 60px -28px oklch(0 0 0 / 0.55);
+}
+.bk-typeset {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10%;
+  color: var(--fg);
+  font-size: calc(var(--hpx) * 0.04);
+  line-height: 1.25;
+}
+.bk-typeset > span:last-child {
+  font-size: calc(var(--hpx) * 0.03);
+  opacity: 0.8;
+}
+/* Sliding indicator behind the selected filter */
+.bk-pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  border-radius: 999px;
+  background: var(--ink);
+  transition:
+    width 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }

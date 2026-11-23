@@ -1,8 +1,8 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { Metadata } from "next";
-// next/image only ships a default export.
-import Image from "next/image";
+import sharp from "sharp";
+import { BookShelf, type ShelfBook } from "~/components/book-shelf";
 import { type Book, bookSlug, books } from "~/config/books";
 import { jpegSize } from "~/lib/jpeg-size";
 import { wideWidth } from "~/lib/page-width";
@@ -13,107 +13,134 @@ export const metadata: Metadata = {
   alternates: { canonical: "/books" },
 };
 
+type RGB = [number, number, number];
+
+const hex = (c: RGB) =>
+  `#${c.map((v) => Math.round(v).toString(16).padStart(2, "0")).join("")}`;
+
+// Relative luminance (sRGB), 0–1
+function luminance([r, g, b]: RGB) {
+  const lin = (v: number) => {
+    const s = v / 255;
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+
+const contrast = (a: RGB, b: RGB) => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+};
+
+const INK: RGB = [20, 20, 20];
+const PAPER: RGB = [244, 242, 237];
+const FALLBACK = {
+  bg: "#2b2a2e",
+  fg: hex(PAPER),
+  band: "#c9a24a",
+  bandFg: "#2b2a2e",
+};
+
+/**
+ * Spine colors from the cover itself: the background is the cover's dominant
+ * color, the text is ink or paper (whichever reads), and the band is the most
+ * colorful patch of the cover that stands apart from the background.
+ */
+async function spineColors(file: string) {
+  try {
+    const img = sharp(file);
+    const { dominant } = await img.stats();
+    const bg: RGB = [dominant.r, dominant.g, dominant.b];
+    // Whichever of ink or paper reads better
+    const fg = contrast(bg, INK) > contrast(bg, PAPER) ? INK : PAPER;
+
+    const { data } = await img
+      .resize(6, 6, { fit: "fill" })
+      .removeAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    let band: RGB = fg;
+    let best = 0;
+    for (let i = 0; i < data.length; i += 3) {
+      const px: RGB = [data[i], data[i + 1], data[i + 2]];
+      const dist = Math.hypot(px[0] - bg[0], px[1] - bg[1], px[2] - bg[2]);
+      const sat = Math.max(...px) - Math.min(...px);
+      const score = dist * (0.5 + sat / 255);
+      if (dist > 90 && score > best) {
+        best = score;
+        band = px;
+      }
+    }
+    // The band's number: the spine color if it reads, else ink or paper
+    const bandFg = [bg, INK, PAPER].reduce((x, y) =>
+      contrast(band, y) > contrast(band, x) + (x === bg ? 1.5 : 0) ? y : x,
+    );
+    return { bg: hex(bg), fg: hex(fg), band: hex(band), bandFg: hex(bandFg) };
+  } catch {
+    return FALLBACK;
+  }
+}
+
+/** Hand-picked colors from the config win; text colors follow them. */
+function withOverride(
+  auto: typeof FALLBACK,
+  pick: Book["spine"],
+): typeof FALLBACK {
+  if (!pick) return auto;
+  const rgb = (h: string): RGB => {
+    const n = Number.parseInt(h.replace("#", ""), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  };
+  const bg = rgb(pick.bg);
+  const band = rgb(pick.band ?? auto.band);
+  const fg = contrast(bg, INK) > contrast(bg, PAPER) ? INK : PAPER;
+  const bandFg =
+    contrast(band, bg) > 3
+      ? bg
+      : contrast(band, INK) > contrast(band, PAPER)
+        ? INK
+        : PAPER;
+  return { bg: hex(bg), fg: hex(fg), band: hex(band), bandFg: hex(bandFg) };
+}
+
 // Static page: this runs once at build, so reading covers off disk is free.
-function cover(book: Book) {
+async function toShelfBook(book: Book): Promise<ShelfBook> {
   const src = `/books/${bookSlug(book)}.jpg`;
   const file = join(process.cwd(), "public", src);
   const size = existsSync(file) ? jpegSize(file) : null;
-  return size ? { src, ...size } : null;
+  return {
+    title: book.title,
+    author: book.author,
+    status: book.status,
+    note: book.note,
+    finished: book.finished,
+    href: book.href,
+    cover: size ? { src, ...size } : null,
+    spine: withOverride(size ? await spineColors(file) : FALLBACK, book.spine),
+  };
 }
 
-function ShelfBook({ book }: { book: Book }) {
-  const c = cover(book);
-  const art = c ? (
-    <Image
-      src={c.src}
-      alt={`Cover of ${book.title}`}
-      width={c.width}
-      height={c.height}
-      sizes="(min-width: 1024px) 140px, (min-width: 640px) 120px, 100px"
-      className="block h-full w-auto"
-    />
-  ) : (
-    // Typeset stand-in when no cover could be fetched
-    <span className="flex h-full aspect-[2/3] flex-col justify-between bg-surface p-2.5">
-      <span className="font-display text-[12px] leading-snug text-ink">
-        {book.title}
-      </span>
-      <span className="text-[10px] leading-snug text-muted">{book.author}</span>
-    </span>
-  );
+const ORDER: Book["status"][] = ["reading", "want", "read"];
 
-  const body = (
-    <>
-      <span className="shelf-book">{art}</span>
-      {/* Library-style tag under the plank. w-0 min-w-full: exactly as wide
-          as the book, so long titles wrap instead of pushing books apart. */}
-      <span className="shelf-label block w-0 min-w-full">
-        <span className="text-[13px] font-medium leading-snug text-ink line-clamp-2 group-hover:text-primary transition-colors">
-          {book.title}
-        </span>
-        <span className="text-xs leading-snug text-muted line-clamp-1">
-          {book.author}
-          {book.finished && (
-            <span className="tabular-nums"> · {book.finished}</span>
-          )}
-        </span>
-      </span>
-    </>
-  );
-
-  return book.href ? (
-    <a
-      href={book.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group shelf-slot rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-    >
-      {body}
-    </a>
-  ) : (
-    <div className="group shelf-slot">{body}</div>
-  );
-}
-
-function Shelf({ title, items }: { title: string; items: Book[] }) {
-  if (items.length === 0) return null;
-  return (
-    <section aria-label={title}>
-      <h2 className="font-display text-xl text-ink flex items-baseline gap-2">
-        {title}
-        <span className="text-sm text-muted tabular-nums">{items.length}</span>
-      </h2>
-      <ul className="shelf">
-        {items.map((book) => (
-          <li key={`${book.title}-${book.author}`}>
-            <ShelfBook book={book} />
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-export default function BooksPage() {
-  const byStatus = (s: Book["status"]) => books.filter((b) => b.status === s);
-  const read = byStatus("read")
+export default async function BooksPage() {
+  const sorted = ORDER.flatMap((status) => {
+    const group = books.filter((b) => b.status === status);
     // Most recently finished first; undated reads keep their config order
-    .sort((a, b) => (b.finished ?? 0) - (a.finished ?? 0));
+    return status === "read"
+      ? group.sort((a, b) => (b.finished ?? 0) - (a.finished ?? 0))
+      : group;
+  });
+  const shelf = await Promise.all(sorted.map(toShelfBook));
 
   return (
-    <div className={`mx-auto ${wideWidth} px-6 py-14 anim-page`}>
-      <div className="mb-8">
-        <h1 className="font-display text-3xl text-ink mb-2">Books</h1>
+    <div className={`mx-auto ${wideWidth} px-6 pt-10 pb-12 anim-page`}>
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+        <h1 className="font-display text-3xl text-ink">Books</h1>
         <p className="text-[15px] text-muted">
-          What I'm reading, what's next on the pile, and what I've finished.
+          What I'm reading, what's next, and what I've finished.
         </p>
       </div>
-
-      <div className="space-y-12">
-        <Shelf title="Reading now" items={byStatus("reading")} />
-        <Shelf title="Up next" items={byStatus("want")} />
-        <Shelf title="Read" items={read} />
-      </div>
+      <BookShelf books={shelf} />
     </div>
   );
 }

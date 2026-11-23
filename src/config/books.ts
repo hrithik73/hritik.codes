@@ -15,6 +15,11 @@ export type Book = {
   /** Pins the exact edition when the title search picks the wrong cover. */
   isbn?: string;
   href?: string;
+  /**
+   * Spine colors. Picked from the cover automatically; set these when the
+   * cover's main color makes a dull spine (all black, all white).
+   */
+  spine?: { bg: string; band?: string };
 };
 
 /** File name for a book's cover: public/books/<slug>.jpg */
